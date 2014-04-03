@@ -1,21 +1,35 @@
-# Compiled Object files
-*.slo
-*.lo
+.deps/
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+missing
+stamp-h1
+
+Ogre.log
+assignment3
+assignment3-Assignment2.o
+assignment3-Ball.o
+assignment3-BaseApplication.o
+assignment3-PlayingField.o
+ogre.cfg
+
+swilken-local/
+
+*.swp
 *.o
-*.obj
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+*~
+media/
+CEGUI.log
+chat
