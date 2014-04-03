@@ -1,6 +1,6 @@
 /*
 -----------------------------------------------------------------------------
-Filename:    Assignment4.h
+Filename:    Whirlybirds.h
 -----------------------------------------------------------------------------
 
 This source file is part of the
@@ -14,8 +14,8 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
-#ifndef __Assignment4_h_
-#define __Assignment4_h_
+#ifndef __Whirlybirds_h_
+#define __Whirlybirds_h_
 
 #include "UDPNetEnt.h"
 #include <btBulletDynamicsCommon.h>
@@ -35,7 +35,7 @@ This source file is part of the
 #include "ServerToClient.h"
 #include "ClientToServer.h"
 
-class Assignment4 : public BaseApplication
+class Whirlybirds : public BaseApplication
 {
 protected:
 	GUI* gui;
@@ -70,8 +70,8 @@ protected:
     void createSceneObjects(void);
     
 public:
-    Assignment4();
-    virtual ~Assignment4(void);
+    Whirlybirds();
+    virtual ~Whirlybirds(void);
 };
 
-#endif // #ifndef __Assignment4_h_
+#endif // #ifndef __Whirlybirds_h_

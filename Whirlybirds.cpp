@@ -1,6 +1,6 @@
 /*
 -----------------------------------------------------------------------------
-Filename:    Assignment4.cpp
+Filename:    Whirlybirds.cpp
 -----------------------------------------------------------------------------
 
 This source file is part of the
@@ -14,16 +14,16 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
-#include "Assignment4.h"
+#include "Whirlybirds.h"
 
 //-------------------------------------------------------------------------------------
-Assignment4::Assignment4()
+Whirlybirds::Whirlybirds()
 {
     simulator = NULL;
 }
 
 //-------------------------------------------------------------------------------------
-Assignment4::~Assignment4(void)
+Whirlybirds::~Whirlybirds(void)
 {
 }
 
@@ -46,11 +46,11 @@ int sPort = 49152;
 char* sip;
 
 //-------------------------------------------------------------------------------------
-void Assignment4::createScene(void)
+void Whirlybirds::createScene(void)
 {
-	CEGUI::Event::Subscriber* spSub = new CEGUI::Event::Subscriber(&Assignment4::singlePlayer, this);
-	CEGUI::Event::Subscriber* clientSub = new CEGUI::Event::Subscriber(&Assignment4::clientStart, this);
-	CEGUI::Event::Subscriber* serverSub = new CEGUI::Event::Subscriber(&Assignment4::serverStart, this);
+	CEGUI::Event::Subscriber* spSub = new CEGUI::Event::Subscriber(&Whirlybirds::singlePlayer, this);
+	CEGUI::Event::Subscriber* clientSub = new CEGUI::Event::Subscriber(&Whirlybirds::clientStart, this);
+	CEGUI::Event::Subscriber* serverSub = new CEGUI::Event::Subscriber(&Whirlybirds::serverStart, this);
 	gui = new GUI(spSub, clientSub, serverSub);
 	   
 	// Set the scene's ambient light
@@ -69,7 +69,7 @@ float PADDLE_X_SPEED = 60.0f,
       PADDLE_ROT_SPEED = 30.0f,
       HELI_SPEED = 120.0f;
 
-bool Assignment4::frameRenderingQueued(const Ogre::FrameEvent& evt) {
+bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     
     static Ogre::Real z_time = 0.0;
 
@@ -164,7 +164,7 @@ bool Assignment4::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     return true;
 }
 
-void Assignment4::updateIndicator(Ball* ball) {
+void Whirlybirds::updateIndicator(Ball* ball) {
     Ogre::Vector3 world_point = ball->getNode().getPosition();
 
     bool isBallVisible = mCamera->isVisible(Ogre::Sphere(world_point, 1.0));
@@ -190,13 +190,13 @@ void Assignment4::updateIndicator(Ball* ball) {
     }
 }
 
-ServerToClient* Assignment4::initServerToClient(){
+ServerToClient* Whirlybirds::initServerToClient(){
     ServerToClient* data = new ServerToClient();
     
     return data;
 }
 
-bool Assignment4::keyPressed(const OIS::KeyEvent &arg)
+bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 {   
 	CEGUI::System &sys = CEGUI::System::getSingleton();
 	sys.injectKeyDown(arg.key);
@@ -216,13 +216,13 @@ bool Assignment4::keyPressed(const OIS::KeyEvent &arg)
 	return true;
 }
 
-bool Assignment4::keyReleased(const OIS::KeyEvent &arg)
+bool Whirlybirds::keyReleased(const OIS::KeyEvent &arg)
 {
 	CEGUI::System::getSingleton().injectKeyUp(arg.key);
 	return true;
 }
 
-CEGUI::MouseButton Assignment4::convertButton(OIS::MouseButtonID buttonID) {
+CEGUI::MouseButton Whirlybirds::convertButton(OIS::MouseButtonID buttonID) {
 	switch (buttonID) {
 		case OIS::MB_Left:
 			return CEGUI::LeftButton;
@@ -235,7 +235,7 @@ CEGUI::MouseButton Assignment4::convertButton(OIS::MouseButtonID buttonID) {
 	}
 }
 
-bool Assignment4::mouseMoved(const OIS::MouseEvent &arg)
+bool Whirlybirds::mouseMoved(const OIS::MouseEvent &arg)
 {
 	CEGUI::System &sys = CEGUI::System::getSingleton();
 	sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
@@ -244,19 +244,19 @@ bool Assignment4::mouseMoved(const OIS::MouseEvent &arg)
 	return true;
 }
 
-bool Assignment4::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
+bool Whirlybirds::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 {
 	CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
 	return true;
 }
 
-bool Assignment4::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
+bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 {
 	CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
 	return true;
 }
 
-void Assignment4::createSceneObjects() {
+void Whirlybirds::createSceneObjects() {
 	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
 
 	 if (!isSinglePlayer) {
@@ -264,7 +264,7 @@ void Assignment4::createSceneObjects() {
 
 }
 
-bool Assignment4::singlePlayer(const CEGUI::EventArgs &e)
+bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
     isSinglePlayer = true;
@@ -284,7 +284,7 @@ bool Assignment4::singlePlayer(const CEGUI::EventArgs &e)
     return true;
 }
 
-bool Assignment4::clientStart(const CEGUI::EventArgs &e)
+bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 {
 	isClient = true;
 	sPort = gui->getPort();
@@ -300,7 +300,7 @@ bool Assignment4::clientStart(const CEGUI::EventArgs &e)
 	return true;
 }
 
-bool Assignment4::serverStart(const CEGUI::EventArgs &e)
+bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 {
 	isClient = false;
 	sPort = gui->getPort();
@@ -333,7 +333,7 @@ extern "C" {
 #endif
     {
         // Create application object
-        Assignment4 app;
+        Whirlybirds app;
         try {
             app.go();
         } catch( Ogre::Exception& e ) {
