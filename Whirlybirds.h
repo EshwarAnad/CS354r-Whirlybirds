@@ -37,6 +37,7 @@ This source file is part of the
 
 class Whirlybirds : public BaseApplication
 {
+
 protected:
 	GUI* gui;
     Ogre::ManualObject* manualInd;

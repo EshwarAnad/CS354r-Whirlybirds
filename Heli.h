@@ -12,6 +12,10 @@ protected:
     HeliProp* prop;
     Ogre::SceneNode* rootNode;
     bool fullMove;
+	Ogre::Real xTilt;
+	Ogre::Real zTilt;
+	Ogre::Real maxXTilt;
+	Ogre::Real maxZTilt;
 public:
     Heli(
         Ogre::String nym, 
@@ -31,6 +35,7 @@ public:
     void animate(Ogre::Real);
     void updateTransform();
     void setPropRot(Ogre::Real, Ogre::Real, Ogre::Real, Ogre::Real);
+	void rotate(Ogre::Real);
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();
