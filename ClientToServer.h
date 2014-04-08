@@ -1,10 +1,9 @@
+#pragma once
+
+#include "ServerToClient.h"
+
 class ClientToServerData {
 public:
-    Ogre::Vector3 heliPos;
-    Ogre::Quaternion heliOrient;
-
-    ClientToServerData();
+    HeliPose pose;
 };
 
-ClientToServerData::ClientToServerData() {}
-    
