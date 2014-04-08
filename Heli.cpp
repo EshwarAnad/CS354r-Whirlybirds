@@ -24,9 +24,10 @@ Heli::Heli(
 	zTilt = 0.0;
 	maxXTilt = 25.0;
 	maxZTilt = 15.0;
-	HELI_X_SPEED = 50.0f,
-	HELI_Y_SPEED = 30.0f,
-	HELI_Z_SPEED = 50.0f;
+	moveSpeed = 50.0f;
+	elevateSpeed = 30.0f;
+	rotSpeed = 20.0f;
+	levelSpeed = 0.05f;
 }
 
 void Heli::addToSimulator(){
@@ -43,26 +44,28 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 	float xMove;
 	float yMove;
 	float zMove;
-	float xRot = x * HELI_X_SPEED;
-	float zRot = z * HELI_Z_SPEED;
+	float xRot = x * rotSpeed;
+	float zRot = z * rotSpeed;
 	if (x < 0.0) {
 		if (xTilt > -maxXTilt) {
 			rootNode->roll(Ogre::Degree(-xRot), Ogre::Node::TS_LOCAL);
 			xTilt -= -xRot;
+			//xMove = x * (moveSpeed + xTilt);
 		} 
 	} else if (x > 0.0) {
 		if (xTilt < maxXTilt) {
 			rootNode->roll(Ogre::Degree(-xRot), Ogre::Node::TS_LOCAL);
 			xTilt += xRot;
+			//xMove = x * (moveSpeed - xTilt);
 		}
 	} else {
-		/*if (xTilt < 0) {
-			rootNode->roll(Ogre::Degree(x), Ogre::Node::TS_LOCAL);
-			xTilt += x;
-		} else {
-			rootNode->roll(Ogre::Degree(-x), Ogre::Node::TS_LOCAL);
-			xTilt -=x;
-		}*/
+		if (xTilt < 0) {
+			rootNode->roll(Ogre::Degree(-levelSpeed), Ogre::Node::TS_LOCAL);
+			xTilt += levelSpeed;
+		} else if (xTilt > 0) {
+			rootNode->roll(Ogre::Degree(levelSpeed), Ogre::Node::TS_LOCAL);
+			xTilt -= levelSpeed;
+		}
 	}
 	if (z < 0.0) {
 		if (zTilt > -maxZTilt) {
@@ -74,10 +77,18 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 			rootNode->pitch(Ogre::Degree(zRot), Ogre::Node::TS_LOCAL);
 			zTilt += zRot;
 		}
+	} else {
+		if (zTilt < 0) {
+			rootNode->pitch(Ogre::Degree(levelSpeed), Ogre::Node::TS_LOCAL);
+			zTilt += levelSpeed;
+		} else if (zTilt > 0) {
+			rootNode->pitch(Ogre::Degree(-levelSpeed), Ogre::Node::TS_LOCAL);
+			zTilt -= levelSpeed;
+		}
 	}
-	xMove = x * HELI_X_SPEED;
-	yMove = y * HELI_Y_SPEED;
-	zMove = z * HELI_Z_SPEED;
+	xMove = x * moveSpeed;
+	yMove = y * elevateSpeed;
+	zMove = z * moveSpeed;
     rootNode->translate(rootNode->getLocalAxes(), xMove, yMove, zMove);
 }
 
