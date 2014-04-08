@@ -16,6 +16,10 @@ protected:
 	Ogre::Real zTilt;
 	Ogre::Real maxXTilt;
 	Ogre::Real maxZTilt;
+	float moveSpeed;
+	float elevateSpeed;
+	float rotSpeed;
+	float levelSpeed;
 public:
     Heli(
         Ogre::String nym, 

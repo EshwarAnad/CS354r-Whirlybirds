@@ -63,15 +63,10 @@ void Whirlybirds::createScene(void)
 	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
-float HELI_X_SPEED = 60.0f,
-      HELI_Y_SPEED = 60.0f,
-      HELI_Z_SPEED = 60.0f,
-      HELI_ROT_SPEED = 30.0f,
-      HELI_SPEED = 120.0f;
-
 bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     
     static Ogre::Real z_time = 0.0;
+	float xMove, yMove, zMove;
 
     if(mWindow->isClosed())
         return false;
@@ -86,33 +81,31 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+		xMove = 0.0,
+		yMove = 0.0,
+		zMove = 0.0;
+
         if(z_time > 0.0 && z_time < 1.0)
             z_time += evt.timeSinceLastFrame;
         else
             z_time = 0.0;
-        if(mKeyboard->isKeyDown(OIS::KC_W)) {
-            p1Heli->move(0.0, 0.0, -HELI_Z_SPEED * evt.timeSinceLastFrame);
-        }
-        if (mKeyboard->isKeyDown(OIS::KC_S)) {
-            p1Heli->move(0.0, 0.0, HELI_Z_SPEED * evt.timeSinceLastFrame);
-        } 
-        if (mKeyboard->isKeyDown(OIS::KC_A)) {
-            p1Heli->move(-HELI_X_SPEED * evt.timeSinceLastFrame, 0.0, 0.0);
-        }
-        if (mKeyboard->isKeyDown(OIS::KC_D)) {
-            p1Heli->move(HELI_X_SPEED * evt.timeSinceLastFrame, 0.0, 0.0);
-        }
-		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT)) {
-			p1Heli->move(0.0, HELI_Y_SPEED * evt.timeSinceLastFrame, 0.0);
-		}
-		if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
-			p1Heli->move(0.0, -HELI_Y_SPEED * evt.timeSinceLastFrame, 0.0);
-		}
-        
+        if(mKeyboard->isKeyDown(OIS::KC_W))
+			zMove = -evt.timeSinceLastFrame;
+        if (mKeyboard->isKeyDown(OIS::KC_S))
+			zMove = evt.timeSinceLastFrame;
+        if (mKeyboard->isKeyDown(OIS::KC_A))
+			xMove = -evt.timeSinceLastFrame;
+        if (mKeyboard->isKeyDown(OIS::KC_D))
+			xMove = evt.timeSinceLastFrame;
+		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT))
+			yMove = evt.timeSinceLastFrame;
+		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
+			yMove = -evt.timeSinceLastFrame;
 
+		p1Heli->move(xMove, yMove, zMove);
+        
         Ogre::Real xMove = mMouse->getMouseState().X.rel;
-        //Ogre::Real yMove = mMouse->getMouseState().Y.rel;
-        p1Heli->rotate(-xMove*0.1);
+        p1Heli->rotate(-xMove*0.05);
         p1Heli->updateTransform();
         // get a packet from the server, then set the ball's position
         if (isClient) {

@@ -1,7 +1,5 @@
 #include "Heli.h"
 
-extern float HELI_SPEED;
-
 Heli::Heli(
     Ogre::String nym, 
     Ogre::SceneManager* mgr, 
@@ -25,7 +23,11 @@ Heli::Heli(
 	xTilt = 0.0;
 	zTilt = 0.0;
 	maxXTilt = 25.0;
-	maxZTilt = 25.0;
+	maxZTilt = 15.0;
+	moveSpeed = 50.0f;
+	elevateSpeed = 30.0f;
+	rotSpeed = 20.0f;
+	levelSpeed = 0.05f;
 }
 
 void Heli::addToSimulator(){
@@ -38,33 +40,56 @@ void Heli::setKinematic(){
     prop->setKinematic();
 }
 
-void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z){
-    rootNode->translate(rootNode->getLocalAxes(), x, y, z);
+void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
+	float xMove;
+	float yMove;
+	float zMove;
+	float xRot = x * rotSpeed;
+	float zRot = z * rotSpeed;
 	if (x < 0.0) {
 		if (xTilt > -maxXTilt) {
-			rootNode->roll(Ogre::Degree(-x), Ogre::Node::TS_LOCAL);
-			xTilt -= -x;
+			rootNode->roll(Ogre::Degree(-xRot), Ogre::Node::TS_LOCAL);
+			xTilt -= -xRot;
+			//xMove = x * (moveSpeed + xTilt);
 		} 
 	} else if (x > 0.0) {
 		if (xTilt < maxXTilt) {
-			rootNode->roll(Ogre::Degree(-x), Ogre::Node::TS_LOCAL);
-			xTilt += x;
+			rootNode->roll(Ogre::Degree(-xRot), Ogre::Node::TS_LOCAL);
+			xTilt += xRot;
+			//xMove = x * (moveSpeed - xTilt);
 		}
 	} else {
 		if (xTilt < 0) {
-			rootNode->roll(Ogre::Degree(x), Ogre::Node::TS_LOCAL);
-			xTilt += x;
-		} else {
-			rootNode->roll(Ogre::Degree(-x), Ogre::Node::TS_LOCAL);
-			xTilt -=x;
+			rootNode->roll(Ogre::Degree(-levelSpeed), Ogre::Node::TS_LOCAL);
+			xTilt += levelSpeed;
+		} else if (xTilt > 0) {
+			rootNode->roll(Ogre::Degree(levelSpeed), Ogre::Node::TS_LOCAL);
+			xTilt -= levelSpeed;
 		}
 	}
-	if (z != 0.0) {
-		//if (zTilt > -maxZTilt) {
-		//	rootNode->pitch(Ogre::Degree(-z), Ogre::Node::TS_LOCAL);
-		//	zTilt -= z;
-		//}
+	if (z < 0.0) {
+		if (zTilt > -maxZTilt) {
+			rootNode->pitch(Ogre::Degree(zRot), Ogre::Node::TS_LOCAL);
+			zTilt -= -zRot;
+		} 
+	} else if (z > 0.0) {
+		if (zTilt < maxZTilt) {
+			rootNode->pitch(Ogre::Degree(zRot), Ogre::Node::TS_LOCAL);
+			zTilt += zRot;
+		}
+	} else {
+		if (zTilt < 0) {
+			rootNode->pitch(Ogre::Degree(levelSpeed), Ogre::Node::TS_LOCAL);
+			zTilt += levelSpeed;
+		} else if (zTilt > 0) {
+			rootNode->pitch(Ogre::Degree(-levelSpeed), Ogre::Node::TS_LOCAL);
+			zTilt -= levelSpeed;
+		}
 	}
+	xMove = x * moveSpeed;
+	yMove = y * elevateSpeed;
+	zMove = z * moveSpeed;
+    rootNode->translate(rootNode->getLocalAxes(), xMove, yMove, zMove);
 }
 
 void Heli::rotate(Ogre::Real angle) {
