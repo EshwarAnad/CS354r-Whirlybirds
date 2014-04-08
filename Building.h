@@ -10,16 +10,17 @@ protected:
     
 public:
     Building(
-        Ogre::String nym, 
+        Ogre::String rootNym,
+        Ogre::String nodeNym, 
         Ogre::SceneManager* mgr, 
         Simulator* sim, 
-        Ogre::Vector3 scale,  
-        Ogre::Vector3 pos, 
+        Ogre::Real worldScale,  
+        Ogre::Vector3 pos,
+        Ogre::Vector3 localScale,
         Ogre::Real restitution, 
         Ogre::Real friction,
         Ogre::String
         );
-    virtual void updateTransform();
 
 };
 

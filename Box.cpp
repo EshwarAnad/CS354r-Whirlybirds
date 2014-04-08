@@ -26,12 +26,12 @@ Box::Box(Ogre::String nym,
     wall[4] = new Surface("WallPosZNode", mgr, sim, 0, height/2, depth/2, width, height, 0);
     wall[5] = new Surface("WallNegZNode", mgr, sim, 0, height/2, -depth/2, width, height, 0);*/
 
-    wall[0] = new Wall("floor", mgr, sim, 0.0, 0.0, 0.0, width, height, Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Z, restitution, friction, floorTex);
-    wall[1] = new Wall("ceiling", mgr, sim, 0.0, height, 0.0, width, height, -Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Z, restitution, friction, wallTex);
-    wall[2] = new Wall("WallPosXNode", mgr, sim, width/2.0, height/2.0, 0.0, width, height, -Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
-    wall[3] = new Wall("WallNegXNode", mgr, sim, -width/2.0, height/2.0, 0.0, width, height, Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
-    wall[4] = new Wall("WallPosZNode", mgr, sim, 0.0, height/2.0, depth/2.0, width, height, -Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
-    wall[5] = new Wall("WallNegZNode", mgr, sim, 0.0, height/2.0, -depth/2.0, width, height, Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
+    wall[0] = new Wall(nym, "floor", mgr, sim, 0.0, 0.0, 0.0, width, height, Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Z, restitution, friction, floorTex);
+    wall[1] = new Wall(nym, "ceiling", mgr, sim, 0.0, height, 0.0, width, height, -Ogre::Vector3::UNIT_Y, Ogre::Vector3::UNIT_Z, restitution, friction, wallTex);
+    wall[2] = new Wall(nym, "WallPosXNode", mgr, sim, width/2.0, height/2.0, 0.0, width, height, -Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
+    wall[3] = new Wall(nym, "WallNegXNode", mgr, sim, -width/2.0, height/2.0, 0.0, width, height, Ogre::Vector3::UNIT_X, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
+    wall[4] = new Wall(nym, "WallPosZNode", mgr, sim, 0.0, height/2.0, depth/2.0, width, height, -Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
+    wall[5] = new Wall(nym, "WallNegZNode", mgr, sim, 0.0, height/2.0, -depth/2.0, width, height, Ogre::Vector3::UNIT_Z, Ogre::Vector3::UNIT_Y, restitution, friction, wallTex);
 
 
     //setup Ogre

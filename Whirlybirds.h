@@ -30,6 +30,7 @@ This source file is part of the
 #include "Server.h"
 #include "Heli.h"
 #include "GUI.h"
+#include "Level.h"
 #include <CEGUI/CEGUI.h>
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include "ServerToClient.h"
@@ -49,7 +50,7 @@ protected:
 
 	//Game Objects
 	Heli* p1Heli;
-
+    Level* level;
     // OIS::KeyListener
     virtual bool keyPressed(const OIS::KeyEvent &arg);
     virtual bool keyReleased(const OIS::KeyEvent &arg);
@@ -69,6 +70,10 @@ protected:
     ServerToClient* initServerToClient();
     void updateIndicator(Ball* ball);
     void createSceneObjects(void);
+
+
+    //debugging
+    void printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent);
     
 public:
     Whirlybirds();

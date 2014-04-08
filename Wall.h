@@ -8,8 +8,11 @@
 #include <Ogre.h>
 
 class Wall : public GameObject {
+	protected:
+		void updateNode(Ogre::String);
 	public:
-		Wall(Ogre::String, 
+		Wall(Ogre::String,
+			Ogre::String, 
 			Ogre::SceneManager*, 
 			Simulator*, 
 			Ogre::Real, 

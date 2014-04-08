@@ -242,10 +242,27 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 	return true;
 }
 
-void Whirlybirds::createSceneObjects() {
-    Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
-	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+void Whirlybirds::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent){
+    Ogre::SceneNode* cur;
+    while(it.hasMoreElements()){
+        cur = dynamic_cast<Ogre::SceneNode*>(it.getNext());
+        std::cout << indent << cur->getName() << std::endl;
+        printNodes(cur->getChildIterator(), indent + "\t");
+    }
 
+}
+
+void Whirlybirds::createSceneObjects() {
+    static Ogre::Real WORLDSCALE = 3.0;
+    Ogre::Vector3 origin(0, 0, 0);
+    level = new Level("mylevel", mSceneMgr, simulator, WORLDSCALE, origin, 0.9, 0.1, "");
+    Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
+	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, WORLDSCALE, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+
+    //iterate through all childs of root (debugging purposes)
+    Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
+    Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
+    printNodes(rootIt, "");
 	 if (!isSinglePlayer) {
      }
 
@@ -266,6 +283,7 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 
 	p1Heli->addToSimulator();
 	p1Heli->setKinematic();
+    level->addToSimulator();
 
 	gui->destroyMenu(true);
     gameplay = true;

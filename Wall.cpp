@@ -1,6 +1,7 @@
 #include "Wall.h"
 
-Wall::Wall(Ogre::String nym, 
+Wall::Wall(Ogre::String rootNym,
+    Ogre::String nodeNym, 
 	Ogre::SceneManager* mgr, 
 	Simulator* sim, 
 	Ogre::Real x, 
@@ -13,16 +14,17 @@ Wall::Wall(Ogre::String nym,
     Ogre::Real restitution,
     Ogre::Real friction,
     Ogre::String tex = "") 
-: GameObject(nym, mgr, sim, restitution, friction) 
+: GameObject(rootNym, mgr, sim, restitution, friction) 
 {
     //setup Ogre
 	if (mgr) {
         Ogre::Plane sceneWall(normal, 0);
 
-        Ogre::MeshManager::getSingleton().createPlane(nym, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+        Ogre::MeshManager::getSingleton().createPlane(nodeNym, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
         sceneWall, width, height, 20, 20, true, 1, 5, 5, texVect);
 
-        geom = mgr->createEntity(nym + "Entity", nym);
+        geom = mgr->createEntity(nodeNym + "Entity", nodeNym);
+        updateNode(nodeNym);
         rootNode->attachObject(geom);
         rootNode->setPosition(x, y, z);
 
@@ -49,4 +51,9 @@ void Wall::update() {
             }
         }
     }
+}
+
+void Wall::updateNode(Ogre::String n){
+    rootNode = rootNode->createChildSceneNode(n);
+    name = n;
 }
