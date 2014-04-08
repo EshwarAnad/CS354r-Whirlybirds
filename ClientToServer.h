@@ -1,13 +1,10 @@
 class ClientToServerData {
 public:
-    Ogre::Vector3 paddlePos;
-    Ogre::Quaternion paddleOrient;
-    int gravityChange;
+    Ogre::Vector3 heliPos;
+    Ogre::Quaternion heliOrient;
 
     ClientToServerData();
 };
 
-ClientToServerData::ClientToServerData()
-: gravityChange(0) 
-{}
+ClientToServerData::ClientToServerData() {}
     

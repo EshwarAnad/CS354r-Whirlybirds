@@ -246,9 +246,8 @@ void Whirlybirds::createSceneObjects() {
     Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
 	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
 
-	 if (!isSinglePlayer) {
-     }
-
+    if (!isSinglePlayer) {
+    }
 }
 
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
