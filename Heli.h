@@ -6,6 +6,14 @@
 #include "HeliChass.h"
 #include "HeliProp.h"
 
+#define maxXZSpeed 60.0
+#define maxYSpeed 30.0
+#define speedIncrement 0.05
+#define speedBase 0.002
+#define maxTilt 25.0
+#define levelSpeed 0.02
+#define rotSpeed 20.0
+
 class Heli {
 protected:
     HeliChass* chass;
@@ -14,12 +22,11 @@ protected:
     bool fullMove;
 	Ogre::Real xTilt;
 	Ogre::Real zTilt;
-	Ogre::Real maxXTilt;
-	Ogre::Real maxZTilt;
-	float moveSpeed;
-	float elevateSpeed;
-	float rotSpeed;
-	float levelSpeed;
+	float xSpeed;
+	float ySpeed;
+	float zSpeed;
+	float speedModifier;
+
 public:
     Heli(
         Ogre::String nym, 
