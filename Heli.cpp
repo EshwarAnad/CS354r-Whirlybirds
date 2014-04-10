@@ -20,9 +20,11 @@ Heli::Heli(
 
     Ogre::Vector3 org(0.0, 0.0, 0.0);
     chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, tex);
+    
     Ogre::Vector3 off(0.0 * scale, 5.0 * scale, 2.5 * scale);
     prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, tex);
-	xTilt = 0.0;
+	
+    xTilt = 0.0;
 	zTilt = 0.0;
 	maxXTilt = 25.0;
 	maxZTilt = 25.0;

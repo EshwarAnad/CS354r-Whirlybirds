@@ -27,18 +27,6 @@ Whirlybirds::~Whirlybirds(void)
 {
 }
 
-float indoffset = .5;
-
-Ogre::Vector3 indPoints[7] = {
-    Ogre::Vector3(0.0+indoffset, 0.05, 0.0),
-    Ogre::Vector3(0.3+indoffset, 0.05, 0.0),
-    Ogre::Vector3(0.3+indoffset, 0.1, 0.0),
-    Ogre::Vector3(0.4+indoffset, 0.0, 0.0),
-    Ogre::Vector3(0.3+indoffset, -0.1, 0.0),
-    Ogre::Vector3(0.3+indoffset, -0.05, 0.0),
-    Ogre::Vector3(0.0+indoffset, -0.05, 0.0)
-};
-
 int startingFace = 0;
 bool gameplay = false;
 bool isSinglePlayer = false;
@@ -91,29 +79,29 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
         else
             z_time = 0.0;
         if(mKeyboard->isKeyDown(OIS::KC_W)) {
-            p1Heli->move(0.0, 0.0, -HELI_Z_SPEED * evt.timeSinceLastFrame);
+            game->heli->move(0.0, 0.0, -HELI_Z_SPEED * evt.timeSinceLastFrame);
         }
         if (mKeyboard->isKeyDown(OIS::KC_S)) {
-            p1Heli->move(0.0, 0.0, HELI_Z_SPEED * evt.timeSinceLastFrame);
+            game->heli->move(0.0, 0.0, HELI_Z_SPEED * evt.timeSinceLastFrame);
         } 
         if (mKeyboard->isKeyDown(OIS::KC_A)) {
-            p1Heli->move(-HELI_X_SPEED * evt.timeSinceLastFrame, 0.0, 0.0);
+            game->heli->move(-HELI_X_SPEED * evt.timeSinceLastFrame, 0.0, 0.0);
         }
         if (mKeyboard->isKeyDown(OIS::KC_D)) {
-            p1Heli->move(HELI_X_SPEED * evt.timeSinceLastFrame, 0.0, 0.0);
+            game->heli->move(HELI_X_SPEED * evt.timeSinceLastFrame, 0.0, 0.0);
         }
 		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT)) {
-			p1Heli->move(0.0, HELI_Y_SPEED * evt.timeSinceLastFrame, 0.0);
+			game->heli->move(0.0, HELI_Y_SPEED * evt.timeSinceLastFrame, 0.0);
 		}
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE)) {
-			p1Heli->move(0.0, -HELI_Y_SPEED * evt.timeSinceLastFrame, 0.0);
+			game->heli->move(0.0, -HELI_Y_SPEED * evt.timeSinceLastFrame, 0.0);
 		}
         
 
         Ogre::Real xMove = mMouse->getMouseState().X.rel;
         //Ogre::Real yMove = mMouse->getMouseState().Y.rel;
-        p1Heli->rotate(-xMove*0.1);
-        p1Heli->updateTransform();
+        game->heli->rotate(-xMove*0.1);
+        game->heli->updateTransform();
         // get a packet from the server, then set the ball's position
         if (isClient) {
             ServerToClient servData;
@@ -123,7 +111,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             }
     
         } else {
-			p1Heli->animate(evt.timeSinceLastFrame);
+			game->heli->animate(evt.timeSinceLastFrame);
 
             if(!isSinglePlayer){
                 server->awaitConnections();
@@ -148,32 +136,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		}
 	}
     return true;
-}
-
-void Whirlybirds::updateIndicator(Ball* ball) {
-    Ogre::Vector3 world_point = ball->getNode().getPosition();
-
-    bool isBallVisible = mCamera->isVisible(Ogre::Sphere(world_point, 1.0));
-    if (!isBallVisible) {
-        Ogre::Vector3 screen_point = mCamera->getProjectionMatrix() * (mCamera->getViewMatrix() * world_point);  
-        
-        float angle = atan2(screen_point.x, screen_point.y);
-
-        manualInd->beginUpdate(0);
-        Ogre::Quaternion rot(Ogre::Radian(-angle + M_PI/2.0), Ogre::Vector3::UNIT_Z);
-        for (int i = 0; i < 7; i++) {
-            manualInd->position(rot * indPoints[i]);
-        }
-        manualInd->end();
-    } else {
-        manualInd->beginUpdate(0);
-        for (int i = 0; i < 7; i++) {
-            Ogre::Vector3 point = indPoints[i];
-            point.z = -1000;
-            manualInd->position(point);
-        }
-        manualInd->end();
-    }
 }
 
 ServerToClient* Whirlybirds::initServerToClient(){
@@ -241,7 +203,7 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 	CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
 	return true;
 }
-
+/*
 void Whirlybirds::createSceneObjects() {
     Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
 	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
@@ -249,7 +211,7 @@ void Whirlybirds::createSceneObjects() {
     if (!isSinglePlayer) {
     }
 }
-
+*/
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
@@ -257,14 +219,15 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 
     simulator = new Simulator();
 
-	createSceneObjects();
+	//createSceneObjects();
+    game = new Game(simulator, mSceneMgr, isClient);
 
-	(&(p1Heli->getNode()))->createChildSceneNode("camNode");
+	(&(game->heli->getNode()))->createChildSceneNode("camNode");
 	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
 	mSceneMgr->getSceneNode("camNode")->translate(0.0, 30.0, 30.0);
 
-	p1Heli->addToSimulator();
-	p1Heli->setKinematic();
+	game->heli->addToSimulator();
+	game->heli->setKinematic();
 
 	gui->destroyMenu(true);
     gameplay = true;
@@ -280,6 +243,8 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 
 	if (client->serverFound) {
 		simulator = new Simulator();
+	    //createSceneObjects();
+        game = new Game(simulator, mSceneMgr, isClient);
 
 		gui->destroyMenu(false);
 		gameplay = true;
@@ -295,8 +260,8 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	
     simulator = new Simulator();
   
-    // Create a scene
-    createSceneObjects();   
+    //createSceneObjects();   
+    game = new Game(simulator, mSceneMgr, isClient);
  
 	gui->destroyMenu(false);
 	gameplay = true;

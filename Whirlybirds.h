@@ -34,6 +34,7 @@ This source file is part of the
 #include <CEGUI/RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include "ServerToClient.h"
 #include "ClientToServer.h"
+#include "Game.h"
 
 class Whirlybirds : public BaseApplication
 {
@@ -47,8 +48,9 @@ protected:
     Client* client;
     bool isClient;
 
-	//Game Objects
-	Heli* p1Heli;
+	// Game Objects
+	//Heli* p1Heli;
+    Game* game;
 
     // OIS::KeyListener
     virtual bool keyPressed(const OIS::KeyEvent &arg);

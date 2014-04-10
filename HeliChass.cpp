@@ -14,11 +14,11 @@ HeliChass::HeliChass(
 : GameObject(nym, mgr, sim, restitution, friction)
 {
     if (mgr) {
-        geom = mgr->createEntity("heliChassEnt", "helichassis.mesh");
+        geom = mgr->createEntity(nym+"chassgeom", "helichassis.mesh");
         if(tex != "")
             geom->setMaterialName(tex);
         geom->setCastShadows(false);
-        updateNode("heliChass");
+        updateNode(nym+"chass");
         rootNode->attachObject(geom);
 
         // sphere starts at 100 units radius

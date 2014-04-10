@@ -11,8 +11,7 @@ struct HeliPose {
 class ServerToClient {
 	public:
         HeliPose heliPoses[Server::NUM_PLAYERS];
-        int numConnected;
-        int clientIndex; // set by the client, specific to the client it sends to
+        int clientIndex; // set by the server, specific to the client it sends to
   		int sound;
 };
 
