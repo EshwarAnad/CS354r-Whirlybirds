@@ -7,7 +7,8 @@ Building::Building(
         Simulator* sim, 
         Ogre::Real worldScale,  
         Ogre::Vector3 pos,
-        Ogre::Vector3 localScale,
+        Ogre::Vector3 dim,
+        Ogre::Vector3 rot,
         Ogre::Real restitution, 
         Ogre::Real friction,
         Ogre::String tex
@@ -20,14 +21,17 @@ Building::Building(
     updateNode(nodeNym);
     rootNode->attachObject(geom);
 
-    Ogre::Vector3 totalScale = localScale*worldScale;
+    Ogre::Vector3 actualDim = dim*worldScale;
     rootNode->setPosition(pos*worldScale);
+    rootNode->pitch(Ogre::Radian(rot.x));
+    rootNode->yaw(Ogre::Radian(rot.y));
+    rootNode->roll(Ogre::Radian(rot.z));
     rootNode->scale(
-       	0.01f * totalScale.x,
-        0.01f * totalScale.y,
-        0.01f * totalScale.z
+       	0.01f * actualDim.x,
+        0.01f * actualDim.y,
+        0.01f * actualDim.z
         );
-    shape = new btBoxShape(btVector3(totalScale.x/2.0,totalScale.y/2.0,totalScale.z/2.0));
+    shape = new btBoxShape(btVector3(actualDim.x/2.0,actualDim.y/2.0,actualDim.z/2.0));
 
 }
 

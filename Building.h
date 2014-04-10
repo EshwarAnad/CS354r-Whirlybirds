@@ -16,7 +16,8 @@ public:
         Simulator* sim, 
         Ogre::Real worldScale,  
         Ogre::Vector3 pos,
-        Ogre::Vector3 localScale,
+        Ogre::Vector3 dim,
+        Ogre::Vector3 rot,
         Ogre::Real restitution, 
         Ogre::Real friction,
         Ogre::String
