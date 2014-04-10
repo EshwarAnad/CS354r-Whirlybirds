@@ -22,12 +22,10 @@ Heli::Heli(
     prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, tex);
 	xTilt = 0.0;
 	zTilt = 0.0;
-	maxXTilt = 25.0;
-	maxZTilt = 15.0;
-	moveSpeed = 50.0f;
-	elevateSpeed = 30.0f;
-	rotSpeed = 20.0f;
-	levelSpeed = 0.05f;
+	xSpeed = 0.0;
+	zSpeed = 0.0;
+	ySpeed = 0.0;
+	speedModifier = 1.0;
 }
 
 void Heli::addToSimulator(){
@@ -46,49 +44,112 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 	float zMove;
 	float xRot = x * rotSpeed;
 	float zRot = z * rotSpeed;
+
 	if (x < 0.0) {
-		if (xTilt > -maxXTilt) {
+		if (xSpeed > 0.0) {
+			x = -x;
+			xSpeed -= speedIncrement;
+		} else if (xSpeed > -maxXZSpeed)
+			xSpeed -= speedIncrement;
+
+		if (xTilt > -maxTilt) {
 			rootNode->roll(Ogre::Degree(-xRot), Ogre::Node::TS_LOCAL);
 			xTilt -= -xRot;
-			//xMove = x * (moveSpeed + xTilt);
 		} 
 	} else if (x > 0.0) {
-		if (xTilt < maxXTilt) {
+		if (xSpeed < 0.0) {
+			x = -x;
+			xSpeed += speedIncrement;
+		} else if (xSpeed < maxXZSpeed)
+			xSpeed += speedIncrement;
+
+		if (xTilt < maxTilt) {
 			rootNode->roll(Ogre::Degree(-xRot), Ogre::Node::TS_LOCAL);
 			xTilt += xRot;
-			//xMove = x * (moveSpeed - xTilt);
 		}
 	} else {
-		if (xTilt < 0) {
+		if (xSpeed < 0.0) {
+			x = -speedBase;
+			xSpeed += speedIncrement;
+		} else if (xSpeed > 0.0) {
+			x = speedBase;
+			xSpeed -= speedIncrement;
+		}
+
+		if (xTilt < 0.0) {
 			rootNode->roll(Ogre::Degree(-levelSpeed), Ogre::Node::TS_LOCAL);
 			xTilt += levelSpeed;
-		} else if (xTilt > 0) {
+		} else if (xTilt > 0.0) {
 			rootNode->roll(Ogre::Degree(levelSpeed), Ogre::Node::TS_LOCAL);
 			xTilt -= levelSpeed;
 		}
 	}
+
 	if (z < 0.0) {
-		if (zTilt > -maxZTilt) {
+		if (zSpeed > 0.0) {
+			z = -z;
+			zSpeed -= speedIncrement;
+		} else if (zSpeed > -maxXZSpeed)
+			zSpeed -= speedIncrement;
+
+		if (zTilt > -maxTilt) {
 			rootNode->pitch(Ogre::Degree(zRot), Ogre::Node::TS_LOCAL);
 			zTilt -= -zRot;
 		} 
 	} else if (z > 0.0) {
-		if (zTilt < maxZTilt) {
+		if (zSpeed < 0.0) {
+			z = -z;
+			zSpeed += speedIncrement;
+		} else if (zSpeed < maxXZSpeed)
+			zSpeed += speedIncrement;
+
+		if (zTilt < maxTilt) {
 			rootNode->pitch(Ogre::Degree(zRot), Ogre::Node::TS_LOCAL);
 			zTilt += zRot;
 		}
 	} else {
-		if (zTilt < 0) {
+		if (zSpeed < 0.0) {
+			z = -speedBase;
+			zSpeed += speedIncrement;
+		} else if (zSpeed > 0.0) {
+			z = speedBase;
+			zSpeed -= speedIncrement;
+		}
+
+		if (zTilt < 0.0) {
 			rootNode->pitch(Ogre::Degree(levelSpeed), Ogre::Node::TS_LOCAL);
 			zTilt += levelSpeed;
-		} else if (zTilt > 0) {
+		} else if (zTilt > 0.0) {
 			rootNode->pitch(Ogre::Degree(-levelSpeed), Ogre::Node::TS_LOCAL);
 			zTilt -= levelSpeed;
 		}
 	}
-	xMove = x * moveSpeed;
-	yMove = y * elevateSpeed;
-	zMove = z * moveSpeed;
+
+	if (y < 0.0) {
+		if (ySpeed > 0.0) {
+			ySpeed -= speedIncrement;
+			y = -y;
+		} else if (ySpeed > -maxYSpeed)
+			ySpeed -= speedIncrement;
+	} else if (y > 0.0) {
+		if (ySpeed < 0.0) {
+			ySpeed += speedIncrement;
+			y = -y;
+		} else if (ySpeed < maxYSpeed)
+			ySpeed += speedIncrement;
+	} else {
+		if (ySpeed < 0.0) {
+			y = -speedBase;
+			ySpeed += speedIncrement;
+		} else if (ySpeed > 0.0) {
+			y = speedBase;
+			ySpeed -= speedIncrement;
+		}
+	}
+
+	xMove = x * std::abs(xSpeed) * speedModifier;
+	yMove = y * std::abs(ySpeed) * speedModifier;
+	zMove = z * std::abs(zSpeed) * speedModifier;
     rootNode->translate(rootNode->getLocalAxes(), xMove, yMove, zMove);
 }
 
