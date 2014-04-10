@@ -6,7 +6,7 @@
 struct HeliPose {
     Ogre::Vector3 pos;
     Ogre::Quaternion orient;
-}
+};
 
 class ServerToClient {
 	public:

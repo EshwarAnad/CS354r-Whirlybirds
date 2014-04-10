@@ -137,7 +137,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             
                 // get the state of the p2HeliObj from the client
                 ClientToServerData cdata;
-                if (server->recMsg(reinterpret_cast<char*>(&cdata))) {
+                if (server->recMsg(reinterpret_cast<char*>(&cdata), 0)) {
                 }
             } else {
                 simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
