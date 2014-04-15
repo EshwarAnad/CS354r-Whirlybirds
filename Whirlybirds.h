@@ -43,7 +43,6 @@ protected:
 	GUI* gui;
     Ogre::ManualObject* manualInd;
     Simulator* simulator;
-    ClientToServerData clientData; 
     Server* server;
     Client* client;
     bool isClient;

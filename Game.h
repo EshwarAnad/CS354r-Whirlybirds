@@ -1,20 +1,25 @@
 #pragma once
 
+#include <Ogre.h>
 #include "Server.h"
+#include "Simulator.h"
 
 class Game {
 protected:
-    ServerToClient data_out;
+    ServerToClient sdata_out;
+    ClientToServer cdata_out;
 
 public:
-	Heli* helis[Server::NUM_PLAYERS];
+	Heli* helis[NUM_PLAYERS];
     Heli* heli; // our helicopter
     Box* box;
     
     Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient);
     ~Game();
     void setDataFromServer(ServerToClient& data);
-    ServerToClient getServerToClientData(void);
+    ServerToClient& getServerToClientData(void);
+    void setDataFromClient(ClientToServer& data, int i);
+    ClientToServer& getClientToServerData(void);
 };
 
 Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
@@ -23,7 +28,7 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
     
     helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
 	
-    for (int i = 1; i < Server::NUM_PLAYERS; i++) {
+    for (int i = 1; i < NUM_PLAYERS; i++) {
         char name[100];
         sprintf(name, "heli%d", i);
         helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
@@ -37,13 +42,25 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
 Game::~Game() {
     delete box;
     
-    for (int i = 0; i < Server::NUM_PLAYERS; i++) {
+    for (int i = 0; i < NUM_PLAYERS; i++) {
         delete helis[i];
     }
 }
 
+void Game::setDataFromClient(ClientToServer& data, int i) {
+    helis[i]->getNode().setPosition(data.pose.pos);
+    helis[i]->getNode().setOrientation(data.pose.orient);
+}
+
+ClientToServer& Game::getClientToServerData(void) {
+    cdata_out.pose.pos = heli->getNode().getPosition();
+    cdata_out.pose.orient = heli->getNode().getOrientation();
+    return cdata_out;
+}
+
 void Game::setDataFromServer(ServerToClient& data) {
-    for (int i = 0; i < Server::NUM_PLAYERS; i++) {
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        if (heli != NULL && i == data.clientIndex) continue;
         helis[i]->getNode().setPosition(data.heliPoses[i].pos);
         helis[i]->getNode().setOrientation(data.heliPoses[i].orient);
     }
@@ -51,15 +68,15 @@ void Game::setDataFromServer(ServerToClient& data) {
     heli = helis[data.clientIndex];
 }
 
-ServerToClient Game::getServerToClientData(void) {
-    data_out.sound = 0;
-    data_out.clientIndex = 0;
+ServerToClient& Game::getServerToClientData(void) {
+    sdata_out.sound = 0;
+    sdata_out.clientIndex = 0;
     
-    for (int i = 0; i < Server::NUM_PLAYERS; i++) {
-        data_out.heliPoses[i].pos = helis[i]->getNode().getPosition();
-        data_out.heliPoses[i].orient = helis[i]->getNode().getOrientation();
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        sdata_out.heliPoses[i].pos = helis[i]->getNode().getPosition();
+        sdata_out.heliPoses[i].orient = helis[i]->getNode().getOrientation();
     }
     
-    return data_out;
+    return sdata_out;
 }
 

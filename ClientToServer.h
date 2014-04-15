@@ -2,7 +2,7 @@
 
 #include "ServerToClient.h"
 
-class ClientToServerData {
+class ClientToServer {
 public:
     HeliPose pose;
 };

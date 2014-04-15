@@ -2,6 +2,9 @@
 #define __Client_h_
 
 #include <SDL_net.h>
+#include "UDPNetEnt.h"
+#include "ClientToServer.h"
+#include "ServerToClient.h"
 
 class Client {
 protected:
@@ -13,8 +16,8 @@ public:
 	bool serverFound;
     Client(char* ipAddr, int port);
     ~Client();
-    bool recMsg(char* data);
-    void sendMsg(char *data, int len);
+    bool recMsg(ServerToClient& data);
+    void sendMsg(ClientToServer& data);
 };
 
 Client::Client(char* ipAddr, int port) {
@@ -55,12 +58,11 @@ Client::~Client() {
     delete ent;
 }
 
-bool Client::recMsg(char* data){
-    return ent->recMsg(data);
+bool Client::recMsg(ServerToClient& data){
+    return ent->recMsg(reinterpret_cast<char*>(&data));
 }
 
-void Client::sendMsg(char *data, int len){
-    ent->sendMsg(data, len);
+void Client::sendMsg(ClientToServer& data){
+    ent->sendMsg(reinterpret_cast<char*>(&data), sizeof(ClientToServer));
 }
-
 #endif

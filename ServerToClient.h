@@ -10,7 +10,7 @@ struct HeliPose {
 
 class ServerToClient {
 	public:
-        HeliPose heliPoses[Server::NUM_PLAYERS];
+        HeliPose heliPoses[NUM_PLAYERS];
         int clientIndex; // set by the server, specific to the client it sends to
   		int sound;
 };

@@ -102,30 +102,36 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
         //Ogre::Real yMove = mMouse->getMouseState().Y.rel;
         game->heli->rotate(-xMove*0.1);
         game->heli->updateTransform();
+        
         // get a packet from the server, then set the ball's position
         if (isClient) {
+            // get state of the game from the server
             ServerToClient servData;
-            
-            // get data from the server
-            if (client->recMsg(reinterpret_cast<char*>(&servData))) {
+            if (client->recMsg(servData)) {
+                game->setDataFromServer(servData);
             }
-    
+
+            // send the position of our helicopter to the server
+            client->sendMsg(game->getClientToServerData());
         } else {
 			game->heli->animate(evt.timeSinceLastFrame);
 
             if(!isSinglePlayer){
                 server->awaitConnections();
-                // step the server's simulator
+                
+                // step the simulator
                 simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
-                // send the state of the target to the client
-                ServerToClient* data = initServerToClient();
-                server->sendMsg(reinterpret_cast<char*>(data), sizeof(ServerToClient));
+                
+                // send the state of the game to the client
+                server->sendMsg(game->getServerToClientData());
                 simulator->soundPlayed = NOSOUND;
-                delete data;
             
-                // get the state of the p2HeliObj from the client
-                ClientToServerData cdata;
-                if (server->recMsg(reinterpret_cast<char*>(&cdata), 0)) {
+                // get the state of the clients' helicopter from the clients
+                for (int i = 0; i < NUM_PLAYERS; i++) {
+                    ClientToServer cdata;
+                    if (server->recMsg(cdata, i)) {
+                        game->setDataFromClient(cdata, i);
+                    }
                 }
             } else {
                 simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
@@ -136,12 +142,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		}
 	}
     return true;
-}
-
-ServerToClient* Whirlybirds::initServerToClient(){
-    ServerToClient* data = new ServerToClient();
-    
-    return data;
 }
 
 bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
@@ -203,15 +203,7 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 	CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
 	return true;
 }
-/*
-void Whirlybirds::createSceneObjects() {
-    Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
-	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
 
-    if (!isSinglePlayer) {
-    }
-}
-*/
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
@@ -219,7 +211,6 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 
     simulator = new Simulator();
 
-	//createSceneObjects();
     game = new Game(simulator, mSceneMgr, isClient);
 
 	(&(game->heli->getNode()))->createChildSceneNode("camNode");
@@ -243,12 +234,20 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 
 	if (client->serverFound) {
 		simulator = new Simulator();
-	    //createSceneObjects();
         game = new Game(simulator, mSceneMgr, isClient);
 
 		gui->destroyMenu(false);
 		gameplay = true;
+        
+        // get state of the game from the server
+        ServerToClient servData;
+        if (client->recMsg(servData)) {
+            game->setDataFromServer(servData);
+        }
+
+        printf("@#$ client starting up...\n");
 	}
+    
 	return true;
 }
 
@@ -260,12 +259,11 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	
     simulator = new Simulator();
   
-    //createSceneObjects();   
     game = new Game(simulator, mSceneMgr, isClient);
  
 	gui->destroyMenu(false);
 	gameplay = true;
-    printf("Server starting up...\n");
+    printf("@#$ Server starting up...\n");
 	return true;
 }
 
