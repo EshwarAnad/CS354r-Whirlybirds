@@ -81,6 +81,10 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+        //send time to heli for collision purposes
+        Ogre::Real t = evt.timeSinceLastFrame;
+        p1Heli->updateTime(t);
+
 		xMove = 0.0,
 		yMove = 0.0,
 		zMove = 0.0;
@@ -250,7 +254,7 @@ void Whirlybirds::createSceneObjects() {
     Ogre::Vector3 origin(0, 0, 0);
     level = new Level("mylevel", mSceneMgr, simulator, WORLDSCALE, origin, 0.9, 0.1, "");
     Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
-	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, WORLDSCALE, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, WORLDSCALE, 1.0, Ogre::Vector3(0.0, 15.0, 50.0), 0.9, 0.1, "Game/Helicopter");
 
     //iterate through all childs of root (debugging purposes)
     Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();

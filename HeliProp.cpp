@@ -83,3 +83,7 @@ void HeliProp::update(){
 void HeliProp::hit(){
     parent->hit();
 }
+
+void HeliProp::updateTime(Ogre::Real& t){
+    deltaT = t;
+}

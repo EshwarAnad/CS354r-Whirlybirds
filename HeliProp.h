@@ -10,6 +10,7 @@ class HeliProp : public GameObject {
 protected:
     void updateNode(Ogre::String);
     Heli* parent;
+    Ogre::Real deltaT;
 
 public:
     HeliProp(
@@ -26,6 +27,7 @@ public:
         );
     virtual void updateTransform();
     virtual void update();
+    void updateTime(Ogre::Real&);
     void hit();
     void spin(Ogre::Real);
 };

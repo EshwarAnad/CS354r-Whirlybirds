@@ -189,4 +189,16 @@ void Heli::updateTransform(){
 
 void Heli::hit(){
 	std::cout << "Taking damage o noes" << std::endl;
+	Ogre::Vector3 temp = rootNode->getPosition();
+	Ogre::Vector3 spdV(xSpeed, ySpeed, zSpeed);
+	rootNode->setPosition(temp - spdV);
+	xSpeed = -xSpeed;
+	ySpeed = -ySpeed;
+	zSpeed = -zSpeed;
+
+}
+
+void Heli::updateTime(Ogre::Real& t){
+	prop->updateTime(t);
+	chass->updateTime(t);
 }

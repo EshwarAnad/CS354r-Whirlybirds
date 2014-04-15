@@ -48,6 +48,7 @@ public:
     void setPropRot(Ogre::Real, Ogre::Real, Ogre::Real, Ogre::Real);
 	void rotate(Ogre::Real);
     void hit();
+    void updateTime(Ogre::Real&);
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();

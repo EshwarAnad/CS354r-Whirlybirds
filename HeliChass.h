@@ -10,7 +10,8 @@ class HeliChass : public GameObject {
 protected:
     void updateNode(Ogre::String);
     Heli* parent;
-    
+    Ogre::Real deltaT;
+
 public:
     HeliChass(
         Ogre::String nym, 
@@ -27,6 +28,7 @@ public:
     virtual void updateTransform();
     virtual void update();
     void hit();
+    void updateTime(Ogre::Real&);
 
 };
 
