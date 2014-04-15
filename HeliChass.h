@@ -9,6 +9,7 @@ protected:
     void updateNode(Ogre::String);
     
 public:
+	float speedModifier;
     HeliChass(
         Ogre::String nym, 
         Ogre::SceneManager* mgr, 
@@ -21,6 +22,7 @@ public:
         Ogre::String
         );
     virtual void updateTransform();
+	virtual void update();
 
 };
 

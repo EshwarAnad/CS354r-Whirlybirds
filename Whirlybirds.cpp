@@ -104,8 +104,8 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 
 		p1Heli->move(xMove, yMove, zMove);
         
-        Ogre::Real xMove = mMouse->getMouseState().X.rel;
-        p1Heli->rotate(-xMove*0.05);
+        Ogre::Real mMove = mMouse->getMouseState().X.rel;
+        p1Heli->rotate(-mMove*0.035);
         p1Heli->updateTransform();
         // get a packet from the server, then set the ball's position
         if (isClient) {
@@ -249,8 +249,9 @@ void Whirlybirds::createSceneObjects() {
     static Ogre::Real WORLDSCALE = 3.0;
     Ogre::Vector3 origin(0, 0, 0);
     level = new Level("mylevel", mSceneMgr, simulator, WORLDSCALE, origin, 0.9, 0.1, "");
-    Box* box = new Box("mybox", mSceneMgr, simulator, 0, 0, 0, 150.0, 150.0, 150.0, 0.9, 0.1, "Examples/Rockwall", "Examples/BeachStones");
-	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, WORLDSCALE, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, WORLDSCALE, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
+	//powerup
+	powerup = new Ball("speed", mSceneMgr, simulator, 20.0, 1.0, Ogre::Vector3(0.0, 300.0, 300.0), 1.0, 1.0, "Game/P1ball");
 
     //iterate through all childs of root (debugging purposes)
     Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
@@ -272,11 +273,12 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 
 	(&(p1Heli->getNode()))->createChildSceneNode("camNode");
 	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
-	mSceneMgr->getSceneNode("camNode")->translate(0.0, 30.0, 30.0);
+	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
 
 	p1Heli->addToSimulator();
 	p1Heli->setKinematic();
     level->addToSimulator();
+	powerup->addToSimulator();
 
 	gui->destroyMenu(true);
     gameplay = true;

@@ -13,6 +13,7 @@ HeliChass::HeliChass(
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
+	speedModifier = 1.0;
     if (mgr) {
         geom = mgr->createEntity("heliChassEnt", "helichassis.mesh");
         if(tex != "")
@@ -56,3 +57,13 @@ void HeliChass::updateTransform() {
         motionState->updateTransform(tr);
     }
 }
+
+void HeliChass::update() {
+	if (callback->ctxt.hit) {
+		Ogre::String& objName = callback->ctxt.theObject->name;
+		if (objName == "speed") {
+			speedModifier = 3.0;
+		}
+	}
+}
+

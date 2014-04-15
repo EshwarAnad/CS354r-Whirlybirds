@@ -8,6 +8,7 @@
 
 #define maxXZSpeed 60.0
 #define maxYSpeed 30.0
+#define maxYawSpeed 30.0
 #define speedIncrement 0.05
 #define speedBase 0.002
 #define maxTilt 25.0
@@ -25,6 +26,8 @@ protected:
 	float xSpeed;
 	float ySpeed;
 	float zSpeed;
+	float yawSpeed;
+	Ogre::String name;
 	float speedModifier;
 
 public:

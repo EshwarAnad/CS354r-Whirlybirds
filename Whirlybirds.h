@@ -51,6 +51,8 @@ protected:
 	//Game Objects
 	Heli* p1Heli;
     Level* level;
+	Ball* powerup;
+
     // OIS::KeyListener
     virtual bool keyPressed(const OIS::KeyEvent &arg);
     virtual bool keyReleased(const OIS::KeyEvent &arg);

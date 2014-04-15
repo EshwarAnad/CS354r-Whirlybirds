@@ -15,7 +15,6 @@ Heli::Heli(
     rootNode = mgr->getRootSceneNode()->createChildSceneNode(nym);
     rootNode->setPosition(pos);
     fullMove = false;
-
     Ogre::Vector3 org(0.0, 0.0, 0.0);
     chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, tex);
     Ogre::Vector3 off(0.0 * scale, 5.0 * scale, 2.5 * scale);
@@ -25,10 +24,12 @@ Heli::Heli(
 	xSpeed = 0.0;
 	zSpeed = 0.0;
 	ySpeed = 0.0;
+	yawSpeed = 0.0;
 	speedModifier = 1.0;
+	name = nym;
 }
 
-void Heli::addToSimulator(){
+void Heli::addToSimulator() {
     chass->addToSimulator();
     prop->addToSimulator();
 }
@@ -44,6 +45,7 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 	float zMove;
 	float xRot = x * rotSpeed;
 	float zRot = z * rotSpeed;
+	speedModifier = chass->speedModifier;
 
 	if (x < 0.0) {
 		if (xSpeed > 0.0) {
@@ -154,6 +156,27 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 }
 
 void Heli::rotate(Ogre::Real angle) {
+	/*if (angle < 0.0) {
+		if (yawSpeed > 0.0) {
+			yawSpeed -= speedIncrement;
+			angle = -angle;
+		} else if (yawSpeed > -maxYawSpeed)
+			yawSpeed -= speedIncrement;
+	} else if (angle > 0.0) {
+		if (yawSpeed < 0.0) {
+			yawSpeed += speedIncrement;
+			angle = -angle;
+		} else if (yawSpeed < maxYawSpeed)
+			yawSpeed += speedIncrement;
+	} else {
+		if (yawSpeed < 0.0) {
+			angle = -speedBase;
+			yawSpeed += speedIncrement;
+		} else if (yawSpeed > 0.0) {
+			angle = speedBase;
+			yawSpeed -= speedIncrement;
+		}
+	}*/
 	rootNode->yaw(Ogre::Degree(angle), Ogre::Node::TS_WORLD);
 }
 

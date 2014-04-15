@@ -47,37 +47,7 @@ Ball::Ball(
 void Ball::update() {
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
-
-        if (objName == "mytarget") {
-			simulator->soundPlayed = BALLTARGET;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playTargetHit();
-            }
-            score++;
-            Target* target = static_cast<Target*>(callback->ctxt.theObject);
-            target->movePlacement();
-        }
-        else if (objName == "clientpaddle") {
-			simulator->soundPlayed = CLIENTBALLPADDLE;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playP2Hit();
-            }
-		}
-		else if (objName == "serverpaddle") {
-			simulator->soundPlayed = SERVERBALLPADDLE;
-			if (simulator->soundOn) {
-				simulator->soundSystem->playRaquetHit();
-        	}
-		}
-        else if (isBox(objName)){
-			simulator->soundPlayed = (this->nym == "serverball") ? BALL1WALL : BALL2WALL;
-            if (simulator->soundOn) {
-				int b = (this->nym == "serverball") ? 1 : 2;
-                simulator->soundSystem->playWallHit(b);
-            }
-        }
-    }
-    else {
+    } else {
         //nothing was hit
     }
 }
