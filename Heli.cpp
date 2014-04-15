@@ -16,9 +16,9 @@ Heli::Heli(
     rootNode->setPosition(pos);
     fullMove = false;
     Ogre::Vector3 org(0.0, 0.0, 0.0);
-    chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, tex);
+    chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, this, tex);
     Ogre::Vector3 off(0.0 * scale, 5.0 * scale, 2.5 * scale);
-    prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, tex);
+    prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, this, tex);
 	xTilt = 0.0;
 	zTilt = 0.0;
 	xSpeed = 0.0;
@@ -208,4 +208,8 @@ void Heli::setPropRot(Ogre::Real x, Ogre::Real y, Ogre::Real z, Ogre::Real w){
 void Heli::updateTransform(){
     chass->updateTransform();
     prop->updateTransform();
+}
+
+void Heli::hit(){
+	std::cout << "Taking damage o noes" << std::endl;
 }

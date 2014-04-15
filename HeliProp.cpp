@@ -1,4 +1,5 @@
 #include "HeliProp.h"
+#include "Heli.h"
 
 HeliProp::HeliProp(
     Ogre::String nym, 
@@ -9,10 +10,12 @@ HeliProp::HeliProp(
     Ogre::Vector3 pos, 
     Ogre::Real restitution, 
     Ogre::Real friction,
+    Heli* p,
     Ogre::String tex = ""
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
+    parent = p;
     if (mgr) {
         geom = mgr->createEntity("heliPropEnt", "heliprop.mesh");
         if(tex != "")
@@ -59,4 +62,24 @@ void HeliProp::updateTransform() {
     if(motionState){
         motionState->updateTransform(tr);
     }
+}
+
+void HeliProp::update(){
+    if (this->callback->ctxt.hit) {
+        Ogre::String& objName = this->callback->ctxt.theObject->name;
+        //hit();
+
+        /*if (objName == "mytarget") {
+            simulator->soundPlayed = BALLTARGET;
+            if (simulator->soundOn) {
+                simulator->soundSystem->playTargetHit();
+            }
+            Target* target = static_cast<Target*>(callback->ctxt.theObject);
+            target->movePlacement();
+        }*/
+    }
+}
+
+void HeliProp::hit(){
+    parent->hit();
 }
