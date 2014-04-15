@@ -41,7 +41,7 @@ Level::Level(
 void Level::addToSimulator(){
 	base->addToSimulator();
 	for(int i = 0; i < NUMBUILDINGS; i++)
-		building[i]->updateTransform();
+		building[i]->addToSimulator();
 }
 void Level::updateTransform(){
 	base->updateTransform();

@@ -1,4 +1,5 @@
 #include "HeliChass.h"
+#include "Heli.h"
 
 HeliChass::HeliChass(
     Ogre::String nym, 
@@ -9,10 +10,12 @@ HeliChass::HeliChass(
     Ogre::Vector3 pos, 
     Ogre::Real restitution, 
     Ogre::Real friction,
+    Heli* p,
     Ogre::String tex = ""
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
+    parent = p;
     if (mgr) {
         geom = mgr->createEntity("heliChassEnt", "helichassis.mesh");
         if(tex != "")
@@ -55,4 +58,28 @@ void HeliChass::updateTransform() {
     if(motionState){
         motionState->updateTransform(tr);
     }
+}
+
+void HeliChass::update(){
+    if (callback->ctxt.hit) {
+        Ogre::String& objName = callback->ctxt.theObject->name;
+        if(objName != "heliProp"){
+            std::cout << "Hit: " << objName << std::endl;
+            hit();
+        }
+    else
+        std::cout << std::endl;
+        /*if (objName == "mytarget") {
+            simulator->soundPlayed = BALLTARGET;
+            if (simulator->soundOn) {
+                simulator->soundSystem->playTargetHit();
+            }
+            Target* target = static_cast<Target*>(callback->ctxt.theObject);
+            target->movePlacement();
+        }*/
+    }
+}
+
+void HeliChass::hit(){
+    parent->hit();
 }
