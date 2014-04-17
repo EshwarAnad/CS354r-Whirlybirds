@@ -104,7 +104,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             if (client->recMsg(servData)) {
                 game->setDataFromServer(servData);
             }
-
+                
             // send the position of our helicopter to the server
             client->sendMsg(game->getClientToServerData());
         } else {
@@ -210,7 +210,7 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
     isSinglePlayer = true;
 
     simulator = new Simulator();
-    game = new Game(simulator, mSceneMgr, isClient);
+    game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
     attachCamera();
 
 	gui->destroyMenu(true);
@@ -221,13 +221,15 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 {
 	isClient = true;
-	sPort = gui->getPort();
+    isSinglePlayer = false;
+	
+    sPort = gui->getPort();
 	sip = gui->getIP();
     client = new Client(sip, sPort);
 
 	if (client->serverFound) {
 		simulator = new Simulator();
-        game = new Game(simulator, mSceneMgr, isClient);
+        game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
 
 		gui->destroyMenu(false);
 		gameplay = true;
@@ -248,11 +250,13 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 {
 	isClient = false;
-	sPort = gui->getPort();
+    isSinglePlayer = false;
+	
+    sPort = gui->getPort();
     server = new Server(sPort);
 	
     simulator = new Simulator();
-    game = new Game(simulator, mSceneMgr, isClient);
+    game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
     attachCamera();
  
 	gui->destroyMenu(false);

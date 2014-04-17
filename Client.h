@@ -10,6 +10,7 @@ class Client {
 protected:
     IPaddress ip; /* Server address */
     TCPsocket TCPsd;
+    char serverIPAddr[100];
 
 public:
     UDPNetEnt* ent;
@@ -48,8 +49,11 @@ Client::Client(char* ipAddr, int port) {
 		serverFound = false;
         //assert(false);
     }
+
 	if (serverFound) {
-    	ent = new UDPNetEnt(ipAddr, 32100, 49153);
+    	ent = new UDPNetEnt();
+        ent->initReceiving(49153);
+        strcpy(serverIPAddr, ipAddr);
 	}
 }
 
@@ -59,7 +63,13 @@ Client::~Client() {
 }
 
 bool Client::recMsg(ServerToClient& data){
-    return ent->recMsg(reinterpret_cast<char*>(&data));
+    bool success = ent->recMsg(reinterpret_cast<char*>(&data));
+    
+    if (success && !ent->hasInitSending) {
+        ent->initSending(serverIPAddr, 32100 + data.clientIndex - 1);
+    }
+
+    return success;
 }
 
 void Client::sendMsg(ClientToServer& data){

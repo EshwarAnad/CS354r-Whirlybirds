@@ -15,7 +15,7 @@ public:
     Level* level;
 	Ball* powerup;
     
-    Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient);
+    Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer);
     ~Game();
 
     void printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent);
@@ -25,7 +25,7 @@ public:
     ClientToServer& getClientToServerData(void);
 };
 
-Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
+Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
 {
     static Ogre::Real WORLDSCALE = 3.0;
     Ogre::Vector3 origin(0, 0, 0);
@@ -34,10 +34,14 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
     level = new Level("mylevel", mSceneMgr, simulator, WORLDSCALE, origin, 0.9, 0.1, "");
 	
     // helicoper(s)
-    for (int i = 0; i < NUM_PLAYERS; i++) {
-        char name[100];
-        sprintf(name, "heli%d", i);
-        helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+    helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+    
+    if (!isSinglePlayer) {
+        for (int i = 1; i < NUM_PLAYERS; i++) {
+            char name[100];
+            sprintf(name, "heli%d", i);
+            helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+        }
     }
 
     // powerup
@@ -48,7 +52,7 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
     Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
     printNodes(rootIt, "");
    
-    if (!isClient) { 
+    if (!isClient || isSinglePlayer) { 
         heli = helis[0];
         heli->addToSimulator();
         heli->setKinematic();
@@ -64,7 +68,6 @@ void Game::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent
         std::cout << indent << cur->getName() << std::endl;
         printNodes(cur->getChildIterator(), indent + "\t");
     }
-
 }
 
 Game::~Game() {
@@ -72,7 +75,9 @@ Game::~Game() {
     delete level;   
  
     for (int i = 0; i < NUM_PLAYERS; i++) {
-        delete helis[i];
+        if (helis[i]) {
+           delete helis[i];
+        }
     }
 }
 

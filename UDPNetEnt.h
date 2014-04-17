@@ -12,8 +12,13 @@ protected:
     UDPpacket *sendPack;
 
 public:
-    UDPNetEnt(char* sendAddress, int sendPort, int recPort);
+    bool hasInitSending, hasInitReceiving;
+    
+    UDPNetEnt();
     ~UDPNetEnt();
+
+    void initSending(char* sendAddress, int sendPort);
+    void initReceiving(int recPort);
     
     bool recMsg(char* out_data); // returns success
     void sendMsg(char* data, int len);
