@@ -1,13 +1,9 @@
-class ClientToServerData {
-public:
-    Ogre::Vector3 paddlePos;
-    Ogre::Quaternion paddleOrient;
-    int gravityChange;
+#pragma once
 
-    ClientToServerData();
+#include "ServerToClient.h"
+
+class ClientToServer {
+public:
+    HeliPose pose;
 };
 
-ClientToServerData::ClientToServerData()
-: gravityChange(0) 
-{}
-    
