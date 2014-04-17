@@ -66,7 +66,7 @@ void Server::awaitConnections(){
 
 void Server::sendMsg(ServerToClient& data) {
     for (int i = 0; i < numConnected; i++) {
-        data.clientIndex = i;
+        data.clientIndex = i+1;
         ents[i]->sendMsg(reinterpret_cast<char*>(&data), sizeof(ServerToClient));
     }
 }

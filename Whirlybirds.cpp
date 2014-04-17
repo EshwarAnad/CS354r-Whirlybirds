@@ -121,10 +121,10 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                 simulator->soundPlayed = NOSOUND;
             
                 // get the state of the clients' helicopter from the clients
-                for (int i = 0; i < NUM_PLAYERS; i++) {
+                for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                     ClientToServer cdata;
                     if (server->recMsg(cdata, i)) {
-                        game->setDataFromClient(cdata, i);
+                        game->setDataFromClient(cdata, i+1);
                     }
                 }
             } else {

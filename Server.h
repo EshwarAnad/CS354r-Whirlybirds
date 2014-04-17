@@ -25,7 +25,7 @@ protected:
     TCPsocket TCPsd;
     IPaddress srvadd;
     int numConnected;
-    UDPNetEnt* ents[NUM_PLAYERS];
+    UDPNetEnt* ents[NUM_PLAYERS - 1];
 
 public:
     Server(int serverPort);
