@@ -10,9 +10,9 @@ class HeliChass : public GameObject {
 protected:
     void updateNode(Ogre::String);
     Heli* parent;
+	Ogre::SceneManager* sMgr;
     
 public:
-	float speedModifier;
     HeliChass(
         Ogre::String nym, 
         Ogre::SceneManager* mgr, 

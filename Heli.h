@@ -54,6 +54,7 @@ public:
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();
+	void speedPowerup();
 };
 
 #endif

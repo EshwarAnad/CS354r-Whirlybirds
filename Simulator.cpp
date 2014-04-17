@@ -38,7 +38,7 @@ void Simulator::setGravity(float g) {
     dynamicsWorld->setGravity(btVector3(0.0f, gravity, 0.0f));
 }
 
-void Simulator::addObject (GameObject* o){
+void Simulator::addObject (GameObject* o) {
 	objList.push_back(o);
 	
     //use default collision group/mask values (dynamic/kinematic/static)
@@ -47,7 +47,11 @@ void Simulator::addObject (GameObject* o){
 }
 
 bool Simulator::removeObject(GameObject* o) {
-
+	dynamicsWorld->removeRigidBody(o->getBody());
+	for (int i = 0; i < objList.size(); i++) {
+		if (objList[i]->name == o->name)
+			objList.erase(objList.begin()+i);
+	}
 }
 
 void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, const Ogre::Real fixedTimestep){

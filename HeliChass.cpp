@@ -15,7 +15,7 @@ HeliChass::HeliChass(
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
-	speedModifier = 1.0;
+	sMgr = mgr;
     parent = p;
     if (mgr) {
         geom = mgr->createEntity(nym+"chassgeom", "helichassis.mesh");
@@ -65,7 +65,9 @@ void HeliChass::update(){
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
 		if (objName == "speed") {
-			speedModifier = 3.0;
+			parent->speedPowerup();
+			sMgr->destroyEntity("speed");
+			simulator->removeObject(callback->ctxt.theObject);
 		}
         if(objName != "heliProp"){
             if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }

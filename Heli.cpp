@@ -45,7 +45,6 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 	float zMove;
 	float xRot = x * rotSpeed;
 	float zRot = z * rotSpeed;
-	speedModifier = chass->speedModifier;
 
 	if (x < 0.0) {
 		if (xSpeed > 0.0) {
@@ -214,4 +213,8 @@ void Heli::hit(){
 	if (DEBUG) {
         std::cout << "Taking damage o noes" << std::endl;
     }
+}
+
+void Heli::speedPowerup() {
+	speedModifier = 3.0;
 }
