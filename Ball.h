@@ -10,6 +10,7 @@ protected:
     bool hitFlag;
     int score;
 	Ogre::String nym;
+	Ogre::SceneManager* sMgr;
 
 public:
     Ball(

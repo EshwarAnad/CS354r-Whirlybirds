@@ -20,7 +20,7 @@ class Simulator {
 		Ogre::SceneManager* sceneMgr;
 
     public:
-		std::deque<GameObject*> objList;
+		std::vector<GameObject*> objList;
         float gravity;
         SoundSystem* soundSystem;
         bool soundOn;
