@@ -198,18 +198,20 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 	return true;
 }
 
+void Whirlybirds::attachCamera(void) {
+	(&(game->heli->getNode()))->createChildSceneNode("camNode");
+	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
+	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+}
+
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
     isSinglePlayer = true;
 
     simulator = new Simulator();
-
     game = new Game(simulator, mSceneMgr, isClient);
-
-	(&(game->heli->getNode()))->createChildSceneNode("camNode");
-	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
-	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+    attachCamera();
 
 	gui->destroyMenu(true);
     gameplay = true;
@@ -234,6 +236,7 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
         ServerToClient servData;
         if (client->recMsg(servData)) {
             game->setDataFromServer(servData);
+            attachCamera();
         }
 
         printf("@#$ client starting up...\n");
@@ -249,8 +252,8 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
     server = new Server(sPort);
 	
     simulator = new Simulator();
-  
     game = new Game(simulator, mSceneMgr, isClient);
+    attachCamera();
  
 	gui->destroyMenu(false);
 	gameplay = true;

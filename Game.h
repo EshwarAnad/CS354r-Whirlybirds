@@ -40,10 +40,6 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
         helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
     }
 
-    if (!isClient) {
-        heli = helis[0];
-    }
-	
     // powerup
 	powerup = new Ball("speed", mSceneMgr, simulator, 20.0, 1.0, Ogre::Vector3(0.0, 300.0, 300.0), 1.0, 1.0, "Game/P1ball");
 
@@ -51,11 +47,14 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
     Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
     Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
     printNodes(rootIt, "");
-    
-    heli->addToSimulator();
-	heli->setKinematic();
-    level->addToSimulator();
-    powerup->addToSimulator();
+   
+    if (!isClient) { 
+        heli = helis[0];
+        heli->addToSimulator();
+        heli->setKinematic();
+        level->addToSimulator();
+        powerup->addToSimulator();
+    }
 }
 
 void Game::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent){

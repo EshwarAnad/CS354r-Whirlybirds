@@ -7,6 +7,9 @@
 #include <Ogre.h>
 #include "ContactSensorCallback.h"
 
+#define DEBUG false
+
+
 class Simulator;
 
 class GameObject {

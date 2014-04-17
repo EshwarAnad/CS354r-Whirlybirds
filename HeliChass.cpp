@@ -68,7 +68,7 @@ void HeliChass::update(){
 			speedModifier = 3.0;
 		}
         if(objName != "heliProp"){
-            std::cout << "Hit: " << objName << std::endl;
+            if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
             hit();
         }
     else
