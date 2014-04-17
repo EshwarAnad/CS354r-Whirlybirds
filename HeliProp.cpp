@@ -17,11 +17,11 @@ HeliProp::HeliProp(
 {
     parent = p;
     if (mgr) {
-        geom = mgr->createEntity("heliPropEnt", "heliprop.mesh");
+        geom = mgr->createEntity(nym+"propgeom", "heliprop.mesh");
         if(tex != "")
             geom->setMaterialName(tex);
         geom->setCastShadows(false);
-        updateNode("heliProp");
+        updateNode(nym+"prop");
         rootNode->attachObject(geom);
 
         // sphere starts at 100 units radius

@@ -27,18 +27,6 @@ Whirlybirds::~Whirlybirds(void)
 {
 }
 
-float indoffset = .5;
-
-Ogre::Vector3 indPoints[7] = {
-    Ogre::Vector3(0.0+indoffset, 0.05, 0.0),
-    Ogre::Vector3(0.3+indoffset, 0.05, 0.0),
-    Ogre::Vector3(0.3+indoffset, 0.1, 0.0),
-    Ogre::Vector3(0.4+indoffset, 0.0, 0.0),
-    Ogre::Vector3(0.3+indoffset, -0.1, 0.0),
-    Ogre::Vector3(0.3+indoffset, -0.05, 0.0),
-    Ogre::Vector3(0.0+indoffset, -0.05, 0.0)
-};
-
 int startingFace = 0;
 bool gameplay = false;
 bool isSinglePlayer = false;
@@ -89,6 +77,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             z_time += evt.timeSinceLastFrame;
         else
             z_time = 0.0;
+        
         if(mKeyboard->isKeyDown(OIS::KC_W))
 			zMove = -evt.timeSinceLastFrame;
         if (mKeyboard->isKeyDown(OIS::KC_S))
@@ -102,35 +91,41 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 			yMove = -evt.timeSinceLastFrame;
 
-		p1Heli->move(xMove, yMove, zMove);
+		game->heli->move(xMove, yMove, zMove);
         
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
-        p1Heli->rotate(-mMove*0.035);
-        p1Heli->updateTransform();
+        game->heli->rotate(-mMove*0.035);
+        game->heli->updateTransform();
+        
         // get a packet from the server, then set the ball's position
         if (isClient) {
+            // get state of the game from the server
             ServerToClient servData;
-            
-            // get data from the server
-            if (client->recMsg(reinterpret_cast<char*>(&servData))) {
+            if (client->recMsg(servData)) {
+                game->setDataFromServer(servData);
             }
-    
+
+            // send the position of our helicopter to the server
+            client->sendMsg(game->getClientToServerData());
         } else {
-			p1Heli->animate(evt.timeSinceLastFrame);
+			game->heli->animate(evt.timeSinceLastFrame);
 
             if(!isSinglePlayer){
                 server->awaitConnections();
-                // step the server's simulator
+                
+                // step the simulator
                 simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
-                // send the state of the target to the client
-                ServerToClient* data = initServerToClient();
-                server->sendMsg(reinterpret_cast<char*>(data), sizeof(ServerToClient));
+                
+                // send the state of the game to the client
+                server->sendMsg(game->getServerToClientData());
                 simulator->soundPlayed = NOSOUND;
-                delete data;
             
-                // get the state of the p2HeliObj from the client
-                ClientToServerData cdata;
-                if (server->recMsg(reinterpret_cast<char*>(&cdata))) {
+                // get the state of the clients' helicopter from the clients
+                for (int i = 0; i < NUM_PLAYERS; i++) {
+                    ClientToServer cdata;
+                    if (server->recMsg(cdata, i)) {
+                        game->setDataFromClient(cdata, i);
+                    }
                 }
             } else {
                 simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
@@ -141,38 +136,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		}
 	}
     return true;
-}
-
-void Whirlybirds::updateIndicator(Ball* ball) {
-    Ogre::Vector3 world_point = ball->getNode().getPosition();
-
-    bool isBallVisible = mCamera->isVisible(Ogre::Sphere(world_point, 1.0));
-    if (!isBallVisible) {
-        Ogre::Vector3 screen_point = mCamera->getProjectionMatrix() * (mCamera->getViewMatrix() * world_point);  
-        
-        float angle = atan2(screen_point.x, screen_point.y);
-
-        manualInd->beginUpdate(0);
-        Ogre::Quaternion rot(Ogre::Radian(-angle + M_PI/2.0), Ogre::Vector3::UNIT_Z);
-        for (int i = 0; i < 7; i++) {
-            manualInd->position(rot * indPoints[i]);
-        }
-        manualInd->end();
-    } else {
-        manualInd->beginUpdate(0);
-        for (int i = 0; i < 7; i++) {
-            Ogre::Vector3 point = indPoints[i];
-            point.z = -1000;
-            manualInd->position(point);
-        }
-        manualInd->end();
-    }
-}
-
-ServerToClient* Whirlybirds::initServerToClient(){
-    ServerToClient* data = new ServerToClient();
-    
-    return data;
 }
 
 bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
@@ -235,33 +198,6 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 	return true;
 }
 
-void Whirlybirds::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent){
-    Ogre::SceneNode* cur;
-    while(it.hasMoreElements()){
-        cur = dynamic_cast<Ogre::SceneNode*>(it.getNext());
-        std::cout << indent << cur->getName() << std::endl;
-        printNodes(cur->getChildIterator(), indent + "\t");
-    }
-
-}
-
-void Whirlybirds::createSceneObjects() {
-    static Ogre::Real WORLDSCALE = 3.0;
-    Ogre::Vector3 origin(0, 0, 0);
-    level = new Level("mylevel", mSceneMgr, simulator, WORLDSCALE, origin, 0.9, 0.1, "");
-	p1Heli = new Heli("p1Heli", mSceneMgr, simulator, WORLDSCALE, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
-	//powerup
-	powerup = new Ball("speed", mSceneMgr, simulator, 20.0, 1.0, Ogre::Vector3(0.0, 300.0, 300.0), 1.0, 1.0, "Game/P1ball");
-
-    //iterate through all childs of root (debugging purposes)
-    Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
-    Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
-    printNodes(rootIt, "");
-	 if (!isSinglePlayer) {
-     }
-
-}
-
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
@@ -269,16 +205,11 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 
     simulator = new Simulator();
 
-	createSceneObjects();
+    game = new Game(simulator, mSceneMgr, isClient);
 
-	(&(p1Heli->getNode()))->createChildSceneNode("camNode");
+	(&(game->heli->getNode()))->createChildSceneNode("camNode");
 	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
 	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
-
-	p1Heli->addToSimulator();
-	p1Heli->setKinematic();
-    level->addToSimulator();
-	powerup->addToSimulator();
 
 	gui->destroyMenu(true);
     gameplay = true;
@@ -294,10 +225,20 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 
 	if (client->serverFound) {
 		simulator = new Simulator();
+        game = new Game(simulator, mSceneMgr, isClient);
 
 		gui->destroyMenu(false);
 		gameplay = true;
+        
+        // get state of the game from the server
+        ServerToClient servData;
+        if (client->recMsg(servData)) {
+            game->setDataFromServer(servData);
+        }
+
+        printf("@#$ client starting up...\n");
 	}
+    
 	return true;
 }
 
@@ -309,12 +250,11 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	
     simulator = new Simulator();
   
-    // Create a scene
-    createSceneObjects();   
+    game = new Game(simulator, mSceneMgr, isClient);
  
 	gui->destroyMenu(false);
 	gameplay = true;
-    printf("Server starting up...\n");
+    printf("@#$ Server starting up...\n");
 	return true;
 }
 
