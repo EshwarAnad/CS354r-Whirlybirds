@@ -24,10 +24,10 @@ class Server {
 protected:
     TCPsocket TCPsd;
     IPaddress srvadd;
-    int numConnected;
     UDPNetEnt* ents[NUM_PLAYERS - 1];
 
 public:
+    int numConnected;
     Server(int serverPort);
     ~Server();
     void awaitConnections();

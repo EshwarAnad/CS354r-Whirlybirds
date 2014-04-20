@@ -101,31 +101,28 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             client->sendMsg(game->getClientToServerData());
         } else {
 			game->heli->animate(evt.timeSinceLastFrame);
+                
+            // step the simulator
+            simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
-            if(!isSinglePlayer){
+            if (!isSinglePlayer) {
                 server->awaitConnections();
                 
-                // step the simulator
-                simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
+                if (server->numConnected > 0) {    
+                    // send the state of the game to the client
+                    server->sendMsg(game->getServerToClientData());
+                    simulator->soundPlayed = NOSOUND;
                 
-                // send the state of the game to the client
-                server->sendMsg(game->getServerToClientData());
-                simulator->soundPlayed = NOSOUND;
-            
-                // get the state of the clients' helicopter from the clients
-                for (int i = 0; i < NUM_PLAYERS - 1; i++) {
-                    ClientToServer cdata;
-                    if (server->recMsg(cdata, i)) {
-                        game->setDataFromClient(cdata, i+1);
+                    // get the state of the clients' helicopters
+                    for (int i = 0; i < NUM_PLAYERS - 1; i++) {
+                        ClientToServer cdata;
+                        if (server->recMsg(cdata, i)) {
+                            game->setDataFromClient(cdata, i+1);
+                        }
                     }
                 }
-            } else {
-                simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
-            } 
+            }
         }
-
-		if(!isClient){
-		}
 	}
     return true;
 }
