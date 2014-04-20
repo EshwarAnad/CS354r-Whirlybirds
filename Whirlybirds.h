@@ -47,6 +47,8 @@ protected:
     Server* server;
     Client* client;
     bool isClient;
+    bool gameplay;
+    bool isSinglePlayer;
 
 	// Game Objects
     Game* game;

@@ -18,20 +18,12 @@ This source file is part of the
 
 //-------------------------------------------------------------------------------------
 Whirlybirds::Whirlybirds()
-{
-    simulator = NULL;
-}
+: simulator(NULL), isClient(false), gameplay(false), isSinglePlayer(false)
+{}
 
 //-------------------------------------------------------------------------------------
 Whirlybirds::~Whirlybirds(void)
-{
-}
-
-int startingFace = 0;
-bool gameplay = false;
-bool isSinglePlayer = false;
-int sPort = 49152;
-char* sip;
+{}
 
 //-------------------------------------------------------------------------------------
 void Whirlybirds::createScene(void)
@@ -223,8 +215,8 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 	isClient = true;
     isSinglePlayer = false;
 	
-    sPort = gui->getPort();
-	sip = gui->getIP();
+    int sPort = gui->getPort();
+	char* sip = gui->getIP();
     client = new Client(sip, sPort);
 
 	if (client->serverFound) {
@@ -252,7 +244,7 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	isClient = false;
     isSinglePlayer = false;
 	
-    sPort = gui->getPort();
+    int sPort = gui->getPort();
     server = new Server(sPort);
 	
     simulator = new Simulator();
