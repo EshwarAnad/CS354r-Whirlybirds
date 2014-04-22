@@ -224,14 +224,16 @@ btVector3 Heli::reflect(btVector3& a, btVector3& b){
 }
 
 btVector3& Heli::convertToWorld(btVector3& a, Ogre::Quaternion& rot){
-	Ogre::Vector3 eulerRot(rot.getPitch().valueRadians(), rot.getYaw().valueRadians(), rot.getRoll().valueRadians());
-	Ogre::Matrix4 xMat = rotXMatrix(-eulerRot.x);
+	Ogre::Matrix4 mat = rootNode->_getFullTransform();
+	//Ogre::Vector3 eulerRot(rot.getPitch().valueRadians(), rot.getYaw().valueRadians(), rot.getRoll().valueRadians());
+	/*Ogre::Matrix4 xMat = rotXMatrix(-eulerRot.x);
 	Ogre::Matrix4 yMat = rotYMatrix(-eulerRot.y);
-	Ogre::Matrix4 zMat = rotZMatrix(-eulerRot.z);
+	Ogre::Matrix4 zMat = rotZMatrix(-eulerRot.z);*/
 	Ogre::Vector4 aOg(a.getX(), a.getY(), a.getZ(), 0);
-	aOg = xMat * aOg;
+	/*aOg = xMat * aOg;
 	aOg = yMat * aOg;
-	aOg = zMat * aOg;
+	aOg = zMat * aOg;*/
+	aOg = mat * aOg;
 	a.setX(aOg.x);
 	a.setY(aOg.y);
 	a.setZ(aOg.z);
@@ -239,14 +241,16 @@ btVector3& Heli::convertToWorld(btVector3& a, Ogre::Quaternion& rot){
 }
 
 btVector3& Heli::convertToLocal(btVector3& a, Ogre::Quaternion& rot){
-	Ogre::Vector3 eulerRot(rot.getPitch().valueRadians(), rot.getYaw().valueRadians(), rot.getRoll().valueRadians());
+	Ogre::Matrix4 mat = rootNode->_getFullTransform().inverse();
+	/*Ogre::Vector3 eulerRot(rot.getPitch().valueRadians(), rot.getYaw().valueRadians(), rot.getRoll().valueRadians());
 	Ogre::Matrix4 xMat = rotXMatrix(eulerRot.x);
 	Ogre::Matrix4 yMat = rotYMatrix(eulerRot.y);
-	Ogre::Matrix4 zMat = rotZMatrix(eulerRot.z);
+	Ogre::Matrix4 zMat = rotZMatrix(eulerRot.z);*/
 	Ogre::Vector4 aOg(a.getX(), a.getY(), a.getZ(), 0);
-	aOg = zMat * aOg;
+	/*aOg = zMat * aOg;
 	aOg = yMat * aOg;
-	aOg = xMat * aOg;
+	aOg = xMat * aOg;*/
+	aOg = mat * aOg;
 	a.setX(aOg.x);
 	a.setY(aOg.y);
 	a.setZ(aOg.z);

@@ -61,17 +61,17 @@ void HeliChass::updateTransform() {
 }
 
 void HeliChass::update(){
-    static Ogre::String compName;
+    //static Ogre::String compName;
     //static Ogre::Real crashTime = 0.0;
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
         if(objName != "heliProp"){
-            if(objName != compName){
-                std::cout << "compName = " << compName << std::endl;
-                compName = objName;
+            //if(objName != compName){
+                //std::cout << "compName = " << compName << std::endl;
+                //compName = objName;
                 std::cout << "Hit: " << objName << std::endl;
                 hit(callback->ctxt);
-            }
+            //}
     /*else
         compName = "";*/
             /*if(crashTime == 0.0 || compName != objName){
