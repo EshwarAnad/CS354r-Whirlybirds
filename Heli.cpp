@@ -214,7 +214,9 @@ void Heli::updateTransform(){
 }
 
 void Heli::hit(){
-	std::cout << "Taking damage o noes" << std::endl;
+	if (DEBUG) {
+        std::cout << "Taking damage o noes" << std::endl;
+    }
 }
 
 void Heli::setPowerup(Ogre::String pwr) {

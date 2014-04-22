@@ -18,16 +18,16 @@
 class ClientToServer;
 class ServerToClient;
 
-#define NUM_PLAYERS 3
+#define NUM_PLAYERS 10
 
 class Server {
 protected:
     TCPsocket TCPsd;
     IPaddress srvadd;
-    int numConnected;
-    UDPNetEnt* ents[NUM_PLAYERS];
+    UDPNetEnt* ents[NUM_PLAYERS - 1];
 
 public:
+    int numConnected;
     Server(int serverPort);
     ~Server();
     void awaitConnections();

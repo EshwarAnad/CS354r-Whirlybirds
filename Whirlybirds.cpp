@@ -18,20 +18,12 @@ This source file is part of the
 
 //-------------------------------------------------------------------------------------
 Whirlybirds::Whirlybirds()
-{
-    simulator = NULL;
-}
+: simulator(NULL), isClient(false), gameplay(false), isSinglePlayer(false)
+{}
 
 //-------------------------------------------------------------------------------------
 Whirlybirds::~Whirlybirds(void)
-{
-}
-
-int startingFace = 0;
-bool gameplay = false;
-bool isSinglePlayer = false;
-int sPort = 49152;
-char* sip;
+{}
 
 //-------------------------------------------------------------------------------------
 void Whirlybirds::createScene(void)
@@ -104,36 +96,33 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             if (client->recMsg(servData)) {
                 game->setDataFromServer(servData);
             }
-
+                
             // send the position of our helicopter to the server
             client->sendMsg(game->getClientToServerData());
         } else {
 			game->heli->animate(evt.timeSinceLastFrame);
+                
+            // step the simulator
+            simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
-            if(!isSinglePlayer){
+            if (!isSinglePlayer) {
                 server->awaitConnections();
                 
-                // step the simulator
-                simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
+                if (server->numConnected > 0) {    
+                    // send the state of the game to the client
+                    server->sendMsg(game->getServerToClientData());
+                    simulator->soundPlayed = NOSOUND;
                 
-                // send the state of the game to the client
-                server->sendMsg(game->getServerToClientData());
-                simulator->soundPlayed = NOSOUND;
-            
-                // get the state of the clients' helicopter from the clients
-                for (int i = 0; i < NUM_PLAYERS; i++) {
-                    ClientToServer cdata;
-                    if (server->recMsg(cdata, i)) {
-                        game->setDataFromClient(cdata, i);
+                    // get the state of the clients' helicopters
+                    for (int i = 0; i < NUM_PLAYERS - 1; i++) {
+                        ClientToServer cdata;
+                        if (server->recMsg(cdata, i)) {
+                            game->setDataFromClient(cdata, i+1);
+                        }
                     }
                 }
-            } else {
-                simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
-            } 
+            }
         }
-
-		if(!isClient){
-		}
 	}
     return true;
 }
@@ -198,18 +187,20 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 	return true;
 }
 
+void Whirlybirds::attachCamera(void) {
+	(&(game->heli->getNode()))->createChildSceneNode("camNode");
+	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
+	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+}
+
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
     isSinglePlayer = true;
 
     simulator = new Simulator();
-
-    game = new Game(simulator, mSceneMgr, isClient);
-
-	(&(game->heli->getNode()))->createChildSceneNode("camNode");
-	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
-	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+    game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
+    attachCamera();
 
 	gui->destroyMenu(true);
     gameplay = true;
@@ -219,13 +210,15 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 {
 	isClient = true;
-	sPort = gui->getPort();
-	sip = gui->getIP();
+    isSinglePlayer = false;
+	
+    int sPort = gui->getPort();
+	char* sip = gui->getIP();
     client = new Client(sip, sPort);
 
 	if (client->serverFound) {
 		simulator = new Simulator();
-        game = new Game(simulator, mSceneMgr, isClient);
+        game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
 
 		gui->destroyMenu(false);
 		gameplay = true;
@@ -234,6 +227,7 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
         ServerToClient servData;
         if (client->recMsg(servData)) {
             game->setDataFromServer(servData);
+            attachCamera();
         }
 
         printf("@#$ client starting up...\n");
@@ -245,12 +239,14 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 {
 	isClient = false;
-	sPort = gui->getPort();
+    isSinglePlayer = false;
+	
+    int sPort = gui->getPort();
     server = new Server(sPort);
 	
     simulator = new Simulator();
-  
-    game = new Game(simulator, mSceneMgr, isClient);
+    game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
+    attachCamera();
  
 	gui->destroyMenu(false);
 	gameplay = true;

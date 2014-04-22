@@ -82,7 +82,7 @@ void HeliChass::update(){
 			simulator->removeObject(callback->ctxt.theObject);
 		}
         if(objName != "heliProp"){
-            std::cout << "Hit: " << objName << std::endl;
+            if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
             hit();
         }
     else

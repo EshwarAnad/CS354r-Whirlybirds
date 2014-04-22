@@ -1,27 +1,18 @@
 #include "UDPNetEnt.h"
 
-UDPNetEnt::UDPNetEnt(char* sendAddress, int sendPort, int recPort) {
+UDPNetEnt::UDPNetEnt() :
+hasInitSending(false), hasInitReceiving(false){
     /* Initialize SDL_net */
     if (SDLNet_Init() < 0)
     {
         fprintf(stderr, "SDLNet_Init: %s\n", SDLNet_GetError());
         exit(EXIT_FAILURE);
     }
- 
-    /* Open a socket */
-    if (!(recSock = SDLNet_UDP_Open(recPort)))
-    {
-        fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
-        exit(EXIT_FAILURE);
-    }
- 
-    /* Make space for the packet */
-    if (!(recPack = SDLNet_AllocPacket(512)))
-    {
-        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
-        exit(EXIT_FAILURE);
-    }
-    
+}
+
+void UDPNetEnt::initSending(char* sendAddress, int sendPort) {
+    hasInitSending = true;
+
     /* Open a socket on random port */
     if (!(sendSock = SDLNet_UDP_Open(0)))
     {
@@ -41,6 +32,24 @@ UDPNetEnt::UDPNetEnt(char* sendAddress, int sendPort, int recPort) {
  
     /* Allocate memory for the packet */
     if (!(sendPack = SDLNet_AllocPacket(512)))
+    {
+        fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+    }
+}
+
+void UDPNetEnt::initReceiving(int recPort) {
+    hasInitReceiving = true;
+
+    /* Open a socket */
+    if (!(recSock = SDLNet_UDP_Open(recPort)))
+    {
+        fprintf(stderr, "SDLNet_UDP_Open: %s\n", SDLNet_GetError());
+        exit(EXIT_FAILURE);
+    }
+ 
+    /* Make space for the packet */
+    if (!(recPack = SDLNet_AllocPacket(512)))
     {
         fprintf(stderr, "SDLNet_AllocPacket: %s\n", SDLNet_GetError());
         exit(EXIT_FAILURE);

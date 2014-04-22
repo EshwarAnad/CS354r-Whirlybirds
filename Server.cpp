@@ -36,7 +36,7 @@ Server::~Server() {
 }
 
 void Server::awaitConnections(){
-    if (numConnected < NUM_PLAYERS) {
+    if (numConnected < NUM_PLAYERS - 1) {
         if (TCPsocket TCPcsd = SDLNet_TCP_Accept(TCPsd)) {
             /*can now communicate with client using csd socket*/
             printf("Connection success\n");
@@ -51,9 +51,12 @@ void Server::awaitConnections(){
                 /* Resolve server name  */
                 /* hacky way to get IPaddress */
                 Uint8* addr = (Uint8*) &remoteIP->host;
-                char clientAddr[100];
+                char clientAddr[100] = {0};
                 sprintf(clientAddr, "%d.%d.%d.%d", addr[0], addr[1], addr[2], addr[3]);
-                ents[numConnected] = new UDPNetEnt(clientAddr, 49153, 32100);
+                
+                ents[numConnected] = new UDPNetEnt();
+                ents[numConnected]->initSending(clientAddr, 49153);
+                ents[numConnected]->initReceiving(32100 + numConnected);
                 
                 numConnected += 1;
             }
@@ -66,7 +69,7 @@ void Server::awaitConnections(){
 
 void Server::sendMsg(ServerToClient& data) {
     for (int i = 0; i < numConnected; i++) {
-        data.clientIndex = i;
+        data.clientIndex = i + 1;
         ents[i]->sendMsg(reinterpret_cast<char*>(&data), sizeof(ServerToClient));
     }
 }

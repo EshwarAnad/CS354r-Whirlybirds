@@ -47,6 +47,8 @@ protected:
     Server* server;
     Client* client;
     bool isClient;
+    bool gameplay;
+    bool isSinglePlayer;
 
 	// Game Objects
     Game* game;
@@ -69,8 +71,7 @@ protected:
 	bool serverStart(const CEGUI::EventArgs &e);
     ServerToClient* initServerToClient();
     void updateIndicator(Ball* ball);
-    void createSceneObjects(void);
-
+    void attachCamera(void);
 
     //debugging
     void printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent);

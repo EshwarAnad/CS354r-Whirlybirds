@@ -17,7 +17,7 @@ public:
     Level* level;
 	Ball* powerup;
     
-    Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient);
+    Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer);
     ~Game();
 
     void printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent);
@@ -28,7 +28,7 @@ public:
 	void spawnPowerup(void);
 };
 
-Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
+Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
 {
 	sim = simulator;
 	mgr = mSceneMgr;
@@ -38,28 +38,32 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient)
     // level 
     level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "");
 	
-    // helicoper(s)
-    for (int i = 0; i < NUM_PLAYERS; i++) {
-        char name[100];
-        sprintf(name, "heli%d", i);
-        helis[i] = new Heli(name, mgr, sim, 3.0, 1.0, Ogre::Vector3(300.0,300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
+    // helicopter(s)
+    helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
+    
+    if (!isSinglePlayer) {
+        for (int i = 1; i < NUM_PLAYERS; i++) {
+            char name[100];
+            sprintf(name, "heli%d", i);
+            helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
+        }
     }
 
-    if (!isClient) {
-        heli = helis[0];
-    }
-	
+    // powerup
 	spawnPowerup();
 
     //iterate through all childs of root (debugging purposes)
     Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
     Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
     printNodes(rootIt, "");
-    
-    heli->addToSimulator();
-	heli->setKinematic();
-    level->addToSimulator();
-    powerup->addToSimulator();
+   
+    if (!isClient || isSinglePlayer) { 
+        heli = helis[0];
+        heli->addToSimulator();
+        heli->setKinematic();
+        level->addToSimulator();
+        powerup->addToSimulator();
+    }
 }
 
 void Game::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent){
@@ -69,7 +73,6 @@ void Game::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent
         std::cout << indent << cur->getName() << std::endl;
         printNodes(cur->getChildIterator(), indent + "\t");
     }
-
 }
 
 Game::~Game() {
@@ -77,7 +80,9 @@ Game::~Game() {
     delete level;   
  
     for (int i = 0; i < NUM_PLAYERS; i++) {
-        delete helis[i];
+        if (helis[i]) {
+           delete helis[i];
+        }
     }
 }
 
