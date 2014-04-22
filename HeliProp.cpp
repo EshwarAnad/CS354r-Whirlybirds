@@ -67,19 +67,9 @@ void HeliProp::updateTransform() {
 void HeliProp::update(){
     if (this->callback->ctxt.hit) {
         Ogre::String& objName = this->callback->ctxt.theObject->name;
-        //hit();
-
-        /*if (objName == "mytarget") {
-            simulator->soundPlayed = BALLTARGET;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playTargetHit();
-            }
-            Target* target = static_cast<Target*>(callback->ctxt.theObject);
-            target->movePlacement();
-        }*/
     }
 }
 
-void HeliProp::hit(){
-    parent->hit();
+void HeliProp::hit(CollisionContext& ctxt){
+    parent->hit(ctxt);
 }
