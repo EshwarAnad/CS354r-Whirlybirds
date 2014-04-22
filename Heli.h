@@ -28,7 +28,10 @@ protected:
 	float zSpeed;
 	float yawSpeed;
 	Ogre::String name;
+	int health;
 	float speedModifier;
+	float powerModifier;
+	bool shield;
 
 public:
     Heli(
@@ -54,7 +57,7 @@ public:
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();
-	void speedPowerup();
+	void setPowerup(Ogre::String);
 };
 
 #endif

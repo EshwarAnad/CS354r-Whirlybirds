@@ -26,7 +26,11 @@ Heli::Heli(
 	ySpeed = 0.0;
 	yawSpeed = 0.0;
 	speedModifier = 1.0;
+	powerModifier = 1.0;
+	shield = false;
 	name = nym;
+	health = 100.0;
+	
 }
 
 void Heli::addToSimulator() {
@@ -213,6 +217,14 @@ void Heli::hit(){
 	std::cout << "Taking damage o noes" << std::endl;
 }
 
-void Heli::speedPowerup() {
-	speedModifier = 3.0;
+void Heli::setPowerup(Ogre::String pwr) {
+	if (pwr == "speed") {
+		speedModifier = 3.0;
+	} else if (pwr == "power") {
+		powerModifier = 2.0;
+	} else if (pwr == "health") {
+		health = (health + 50 > 100) ? 100 : health + 50;
+	} else {
+		shield = true;
+	}
 }

@@ -65,8 +65,20 @@ void HeliChass::update(){
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
 		if (objName == "speed") {
-			parent->speedPowerup();
-			sMgr->destroyEntity("speed");
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+		} else if (objName == "power") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+		} else if (objName == "health") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+		} else if (objName == "shield") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
 			simulator->removeObject(callback->ctxt.theObject);
 		}
         if(objName != "heliProp"){

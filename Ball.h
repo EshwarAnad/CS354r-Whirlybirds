@@ -4,6 +4,7 @@
 #include "Simulator.h"
 #include <Ogre.h>
 
+enum Power { SPEED, POWER, HEALTH, SHIELD };
 enum sounds{NOSOUND, BALLTARGET, BALL1WALL, BALL2WALL, SERVERBALLPADDLE, CLIENTBALLPADDLE};
 class Ball : public GameObject {
 protected:
