@@ -18,7 +18,7 @@
 class ClientToServer;
 class ServerToClient;
 
-#define NUM_PLAYERS 10
+#define NUM_PLAYERS 4
 
 class Server {
 protected:

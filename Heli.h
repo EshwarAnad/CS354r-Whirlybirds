@@ -28,7 +28,11 @@ protected:
 	float zSpeed;
 	float yawSpeed;
 	Ogre::String name;
+	int health;
 	float speedModifier;
+	float powerModifier;
+	bool shield;
+	Ogre::SceneManager* sMgr;
 
 public:
     Heli(
@@ -50,11 +54,20 @@ public:
     void updateTransform();
     void setPropRot(Ogre::Real, Ogre::Real, Ogre::Real, Ogre::Real);
 	void rotate(Ogre::Real);
-    void hit();
+    void hit(CollisionContext&);
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();
-	void speedPowerup();
+    Ogre::String getPropName();
+    Ogre::String getChassName();
+	void setPowerup(Ogre::String);
+	void expirePowerup();
+	time_t powerupTime;
+	time_t currentTime;
+	bool hasPowerup;
+    btVector3 reflect(btVector3& a, btVector3& b);
+    btVector3& convertToWorld(btVector3&);
+    btVector3& convertToLocal(btVector3&);
 };
 
 #endif

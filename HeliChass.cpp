@@ -65,27 +65,29 @@ void HeliChass::update(){
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
 		if (objName == "speed") {
-			parent->speedPowerup();
-			sMgr->destroyEntity("speed");
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+		} else if (objName == "power") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+		} else if (objName == "health") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+		} else if (objName == "shield") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
 			simulator->removeObject(callback->ctxt.theObject);
 		}
-        if(objName != "heliProp"){
+        if(objName != parent->getPropName()){
             if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
-            hit();
+            hit(callback->ctxt);
         }
-    else
-        std::cout << std::endl;
-        /*if (objName == "mytarget") {
-            simulator->soundPlayed = BALLTARGET;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playTargetHit();
-            }
-            Target* target = static_cast<Target*>(callback->ctxt.theObject);
-            target->movePlacement();
-        }*/
     }
 }
 
-void HeliChass::hit(){
-    parent->hit();
+void HeliChass::hit(CollisionContext& ctxt){
+    parent->hit(ctxt);
 }

@@ -18,7 +18,6 @@ Ball::Ball(
 : GameObject(nym, mgr, sim, restitution, friction)
 {
 	sMgr = mgr;
-	nym = nym;
     if (mgr) {
         geom = mgr->createEntity(name, "sphere.mesh");
         if(tex != "")

@@ -8,6 +8,8 @@ class Game {
 protected:
     ServerToClient sdata_out;
     ClientToServer cdata_out;
+	Simulator* sim;
+	Ogre::SceneManager* mgr;
 
 public:
 	Heli* helis[NUM_PLAYERS];
@@ -24,18 +26,21 @@ public:
     void setDataFromClient(ClientToServer& data, int i);
     ClientToServer& getClientToServerData(void);
     void rotateHeliProps(Ogre::Real t);
+	void spawnPowerup(void);
 };
 
 Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
 {
+	sim = simulator;
+	mgr = mSceneMgr;
     static Ogre::Real WORLDSCALE = 3.0;
     Ogre::Vector3 origin(0, 0, 0);
    
     // level 
-    level = new Level("mylevel", mSceneMgr, simulator, WORLDSCALE, origin, 0.9, 0.1, "");
+    level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "");
 	
-    // helicoper(s)
-    helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+    // helicopter(s)
+    helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
     
     for (int i = 1; i < NUM_PLAYERS; i++) {
         if (isSinglePlayer) {
@@ -43,12 +48,12 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         } else {
             char name[100];
             sprintf(name, "heli%d", i);
-            helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
+            helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
         }
     }
 
     // powerup
-	powerup = new Ball("speed", mSceneMgr, simulator, 20.0, 1.0, Ogre::Vector3(0.0, 300.0, 300.0), 1.0, 1.0, "Game/P1ball");
+	spawnPowerup();
 
     //iterate through all childs of root (debugging purposes)
     Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
@@ -125,3 +130,45 @@ ServerToClient& Game::getServerToClientData(void) {
     return sdata_out;
 }
 
+void Game::spawnPowerup(void) {
+	srand (time(NULL));
+	int power = rand()%4;
+	Ogre::String nym;
+	Ogre::String tex;
+	Ogre::Vector3 pos;
+	Ogre::Real x, z;
+	//determine powerup type
+	switch(power) {
+		case SPEED:
+			nym = "speed";
+			tex = "Game/speedBall";
+			x = 0.0;
+			z = 300.0;
+			break;
+		case POWER:
+			nym = "power";
+			tex = "Game/powerBall";
+			x = 300.0;
+			z = 0.0;
+			break;
+		case HEALTH:
+			nym = "health";
+			tex = "Game/healthBall";
+			x = 0.0;
+			z = -330.0;
+			break;
+		case SHIELD:
+			nym = "shield";
+			tex = "Game/shieldBall";
+			x = -280.0;
+			z = 0.0;
+			break;
+		default:
+			nym = "speed";
+			tex = "Game/speedBall";
+			x = 0.0;
+			z = 300.0;
+			break;
+	}
+	powerup = new Ball(nym, mgr, sim, 20.0, 1.0, Ogre::Vector3(x, 300.0, z), 1.0, 1.0, tex);
+}
