@@ -187,18 +187,91 @@ void Heli::updateTransform(){
     prop->updateTransform();
 }
 
-void Heli::hit(){
+void Heli::hit(CollisionContext& ctxt){
 	std::cout << "Taking damage o noes" << std::endl;
 	Ogre::Vector3 temp = rootNode->getPosition();
-	Ogre::Vector3 spdV(xSpeed, ySpeed, zSpeed);
-	rootNode->setPosition(temp - spdV);
-	xSpeed = -xSpeed;
-	ySpeed = -ySpeed;
-	zSpeed = -zSpeed;
+	//Need to get speed based on world coords
+	btVector3 spdV(xSpeed, ySpeed, zSpeed);
+	btScalar mag = spdV.length();
+	spdV = spdV.normalize();
+	Ogre::Quaternion rot = rootNode->getOrientation();
+	Ogre::Vector3 eulerRot(rot.getRoll().valueRadians(), rot.getPitch().valueRadians(), rot.getYaw().valueRadians());
+	std::cout << "Rotation = (" << eulerRot.x << ", " << eulerRot.y << ", " << eulerRot.z << ")" << std::endl;
+	std::cout << "velocity before Rotation = (" << spdV.getX() << ", " << spdV.getY() << ", " << spdV.getZ() << ")" << std::endl;
+	spdV = convertToWorld(spdV, rot);
+	std::cout << "velocity before = (" << spdV.getX() << ", " << spdV.getY() << ", " << spdV.getZ() << ")" << std::endl;
+	std::cout << "wall normal = (" << ctxt.normal.getX() << ", " << ctxt.normal.getY() << ", " << ctxt.normal.getZ() << ")" << std::endl;
+	spdV = reflect(spdV, ctxt.normal);
+	std::cout << "velocity after = (" << spdV.getX() << ", " << spdV.getY() << ", " << spdV.getZ() << ")" << std::endl;
+	rootNode->setPosition(temp + Ogre::Vector3(spdV.getX(), spdV.getY(), spdV.getZ()));
+	//Convert back to local coords
+	spdV = convertToLocal(spdV, rot);
+	std::cout << "velocity after Rotation = (" << spdV.getX() << ", " << spdV.getY() << ", " << spdV.getZ() << ")" << std::endl;
+	spdV = mag * spdV;
+	xSpeed = spdV.getX();
+	ySpeed = spdV.getY();
+	zSpeed = spdV.getZ();
 
 }
 
 void Heli::updateTime(Ogre::Real& t){
 	prop->updateTime(t);
 	chass->updateTime(t);
+}
+
+btVector3 Heli::reflect(btVector3& a, btVector3& b){
+	 return btVector3(((-2 * a.dot(b)) * b) + a);
+}
+
+btVector3& Heli::convertToWorld(btVector3& a, Ogre::Quaternion& rot){
+	Ogre::Vector3 eulerRot(rot.getPitch().valueRadians(), rot.getYaw().valueRadians(), rot.getRoll().valueRadians());
+	Ogre::Matrix4 xMat = rotXMatrix(-eulerRot.x);
+	Ogre::Matrix4 yMat = rotYMatrix(-eulerRot.y);
+	Ogre::Matrix4 zMat = rotZMatrix(-eulerRot.z);
+	Ogre::Vector4 aOg(a.getX(), a.getY(), a.getZ(), 0);
+	aOg = xMat * aOg;
+	aOg = yMat * aOg;
+	aOg = zMat * aOg;
+	a.setX(aOg.x);
+	a.setY(aOg.y);
+	a.setZ(aOg.z);
+	return a;
+}
+
+btVector3& Heli::convertToLocal(btVector3& a, Ogre::Quaternion& rot){
+	Ogre::Vector3 eulerRot(rot.getPitch().valueRadians(), rot.getYaw().valueRadians(), rot.getRoll().valueRadians());
+	Ogre::Matrix4 xMat = rotXMatrix(eulerRot.x);
+	Ogre::Matrix4 yMat = rotYMatrix(eulerRot.y);
+	Ogre::Matrix4 zMat = rotZMatrix(eulerRot.z);
+	Ogre::Vector4 aOg(a.getX(), a.getY(), a.getZ(), 0);
+	aOg = zMat * aOg;
+	aOg = yMat * aOg;
+	aOg = xMat * aOg;
+	a.setX(aOg.x);
+	a.setY(aOg.y);
+	a.setZ(aOg.z);
+	return a;
+}
+
+Ogre::Matrix4 Heli::rotXMatrix(Ogre::Real rot){
+	return Ogre::Matrix4(1, 0, 		  0, 		 0,
+						 0, cos(rot), -sin(rot), 0,
+						 0, sin(rot), cos(rot),  0,
+						 0, 0,		  0,		 1);
+}
+
+Ogre::Matrix4 Heli::rotYMatrix(Ogre::Real rot){
+	return Ogre::Matrix4(cos(rot),  0, sin(rot), 0,
+						 0, 	    1, 0, 	     0,
+						 -sin(rot), 0, cos(rot), 0,
+						 0, 0,		  0,		 1);
+	
+}
+
+Ogre::Matrix4 Heli::rotZMatrix(Ogre::Real rot){
+	return Ogre::Matrix4(cos(rot), -sin(rot), 0, 0,
+						 sin(rot), cos(rot),  0, 0,
+						 0, 	   0, 		  1, 0,
+						 0, 	   0,		  0, 1);
+	
 }

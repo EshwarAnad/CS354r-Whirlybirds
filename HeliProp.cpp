@@ -80,8 +80,8 @@ void HeliProp::update(){
     }
 }
 
-void HeliProp::hit(){
-    parent->hit();
+void HeliProp::hit(CollisionContext& ctxt){
+    parent->hit(ctxt);
 }
 
 void HeliProp::updateTime(Ogre::Real& t){

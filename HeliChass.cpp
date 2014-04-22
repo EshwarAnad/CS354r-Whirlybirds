@@ -67,12 +67,13 @@ void HeliChass::update(){
         Ogre::String& objName = callback->ctxt.theObject->name;
         if(objName != "heliProp"){
             if(objName != compName){
+                std::cout << "compName = " << compName << std::endl;
                 compName = objName;
                 std::cout << "Hit: " << objName << std::endl;
-                hit();
+                hit(callback->ctxt);
             }
-    else
-        compName = "";
+    /*else
+        compName = "";*/
             /*if(crashTime == 0.0 || compName != objName){
                 crashTime = 0.0;
                 compName = objName;
@@ -99,8 +100,8 @@ void HeliChass::update(){
     }
 }
 
-void HeliChass::hit(){
-    parent->hit();
+void HeliChass::hit(CollisionContext& ctxt){
+    parent->hit(ctxt);
 }
 
 void HeliChass::updateTime(Ogre::Real& t){
