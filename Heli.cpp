@@ -32,6 +32,7 @@ Heli::Heli(
 	health = 100.0;
 	hasPowerup = false;
 	time(&powerupTime);
+	sMgr = mgr;
 }
 
 void Heli::addToSimulator() {
@@ -219,6 +220,12 @@ void Heli::setPowerup(Ogre::String pwr) {
 		health = (health + 50 > 100) ? 100 : health + 50;
 	} else {
 		expirePowerup();
+		/*Ogre::SceneNode* s = new Ogre::SceneNode(sMgr, "shieldNode");
+		sMgr->createEntity("theshield", "sphere.mesh");
+		sMgr->getEntity("theshield")->setMaterialName("Game/shieldBall");
+		s->scale(200.0 * 0.01f, 200.0 * 0.01f, 200.0 * 0.01f);
+		sMgr->getSceneNode(name)->addChild(s);
+		s->setPosition(sMgr->getSceneNode(name)->getPosition());*/
 		shield = true;
 	}
 }

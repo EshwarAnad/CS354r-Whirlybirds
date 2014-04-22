@@ -6,10 +6,10 @@
 #include "HeliChass.h"
 #include "HeliProp.h"
 
-#define maxXZSpeed 180.0
-#define maxYSpeed 90.0
+#define maxXZSpeed 60.0
+#define maxYSpeed 30.0
 #define maxYawSpeed 30.0
-#define speedIncrement 1.0
+#define speedIncrement 0.05
 #define speedBase 0.002
 #define maxTilt 25.0
 #define levelSpeed 0.02
@@ -32,6 +32,7 @@ protected:
 	float speedModifier;
 	float powerModifier;
 	bool shield;
+	Ogre::SceneManager* sMgr;
 
 public:
     Heli(
