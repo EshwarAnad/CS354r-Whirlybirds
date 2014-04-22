@@ -6,10 +6,10 @@
 #include "HeliChass.h"
 #include "HeliProp.h"
 
-#define maxXZSpeed 60.0
-#define maxYSpeed 30.0
+#define maxXZSpeed 180.0
+#define maxYSpeed 90.0
 #define maxYawSpeed 30.0
-#define speedIncrement 0.05
+#define speedIncrement 1.0
 #define speedBase 0.002
 #define maxTilt 25.0
 #define levelSpeed 0.02
@@ -58,6 +58,10 @@ public:
     GameObject* getProp();
     Ogre::Real getY();
 	void setPowerup(Ogre::String);
+	void expirePowerup();
+	time_t powerupTime;
+	time_t currentTime;
+	bool hasPowerup;
 };
 
 #endif

@@ -30,7 +30,8 @@ Heli::Heli(
 	shield = false;
 	name = nym;
 	health = 100.0;
-	
+	hasPowerup = false;
+	time(&powerupTime);
 }
 
 void Heli::addToSimulator() {
@@ -50,6 +51,11 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 	float xRot = x * rotSpeed;
 	float zRot = z * rotSpeed;
 
+	//check if powerup time has elapsed
+	time(&currentTime);
+	if (hasPowerup && difftime(currentTime, powerupTime) >= 30)
+		expirePowerup();
+	
 	if (x < 0.0) {
 		if (xSpeed > 0.0) {
 			x = -x;
@@ -159,27 +165,6 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 }
 
 void Heli::rotate(Ogre::Real angle) {
-	/*if (angle < 0.0) {
-		if (yawSpeed > 0.0) {
-			yawSpeed -= speedIncrement;
-			angle = -angle;
-		} else if (yawSpeed > -maxYawSpeed)
-			yawSpeed -= speedIncrement;
-	} else if (angle > 0.0) {
-		if (yawSpeed < 0.0) {
-			yawSpeed += speedIncrement;
-			angle = -angle;
-		} else if (yawSpeed < maxYawSpeed)
-			yawSpeed += speedIncrement;
-	} else {
-		if (yawSpeed < 0.0) {
-			angle = -speedBase;
-			yawSpeed += speedIncrement;
-		} else if (yawSpeed > 0.0) {
-			angle = speedBase;
-			yawSpeed -= speedIncrement;
-		}
-	}*/
 	rootNode->yaw(Ogre::Degree(angle), Ogre::Node::TS_WORLD);
 }
 
@@ -220,13 +205,27 @@ void Heli::hit(){
 }
 
 void Heli::setPowerup(Ogre::String pwr) {
+	time(&powerupTime);
+
+	hasPowerup = true;
 	if (pwr == "speed") {
+		expirePowerup();
 		speedModifier = 3.0;
 	} else if (pwr == "power") {
+		expirePowerup();
 		powerModifier = 2.0;
 	} else if (pwr == "health") {
+		hasPowerup = false;
 		health = (health + 50 > 100) ? 100 : health + 50;
 	} else {
+		expirePowerup();
 		shield = true;
 	}
+}
+
+void Heli::expirePowerup() {
+	speedModifier = 1.0;
+	powerModifier = 1.0;
+	shield = false;
+	hasPowerup = false;
 }
