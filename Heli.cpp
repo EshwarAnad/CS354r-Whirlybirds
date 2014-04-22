@@ -199,12 +199,6 @@ void Heli::updateTransform(){
     prop->updateTransform();
 }
 
-void Heli::hit(){
-	if (DEBUG) {
-        std::cout << "Taking damage o noes" << std::endl;
-    }
-}
-
 void Heli::setPowerup(Ogre::String pwr) {
 	time(&powerupTime);
 
@@ -235,4 +229,56 @@ void Heli::expirePowerup() {
 	powerModifier = 1.0;
 	shield = false;
 	hasPowerup = false;
+}
+
+void Heli::hit(CollisionContext& ctxt){
+	std::cout << "Taking damage o noes" << std::endl;
+	Ogre::Vector3 temp = rootNode->getPosition();
+	btVector3 spdV(xSpeed, ySpeed, zSpeed);
+	btScalar mag = spdV.length();
+	spdV = spdV.normalize();
+	//Convert speed vector to world for collision handling
+	spdV = convertToWorld(spdV);
+	spdV = reflect(spdV, ctxt.normal);
+	//Convert back to local coords to update the speed vector of helicopter
+	spdV = convertToLocal(spdV);
+	spdV = mag * spdV;
+	xSpeed = spdV.getX();
+	ySpeed = spdV.getY();
+	zSpeed = spdV.getZ();
+	//Push the helicopter out of the object it's colliding with by translating along the object's normal
+	//This prevents the helicopter from getting stuck in the object
+	rootNode->setPosition(temp + .01 * Ogre::Vector3(ctxt.normal.getX(), ctxt.normal.getY(), ctxt.normal.getZ()));
+}
+
+btVector3 Heli::reflect(btVector3& a, btVector3& b){
+	 return btVector3(((-2 * a.dot(b)) * b) + a);
+}
+
+btVector3& Heli::convertToWorld(btVector3& a){
+	Ogre::Matrix4 mat = rootNode->_getFullTransform();
+	Ogre::Vector4 aOg(a.getX(), a.getY(), a.getZ(), 0);
+	aOg = mat * aOg;
+	a.setX(aOg.x);
+	a.setY(aOg.y);
+	a.setZ(aOg.z);
+	return a;
+}
+
+btVector3& Heli::convertToLocal(btVector3& a){
+	Ogre::Matrix4 mat = rootNode->_getFullTransform().inverse();
+	Ogre::Vector4 aOg(a.getX(), a.getY(), a.getZ(), 0);
+	aOg = mat * aOg;
+	a.setX(aOg.x);
+	a.setY(aOg.y);
+	a.setZ(aOg.z);
+	return a;
+}
+
+Ogre::String Heli::getChassName() {
+	return chass->name;
+}
+
+Ogre::String Heli::getPropName() {
+	return prop->name;
 }
