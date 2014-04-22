@@ -61,42 +61,12 @@ void HeliChass::updateTransform() {
 }
 
 void HeliChass::update(){
-    //static Ogre::String compName;
-    //static Ogre::Real crashTime = 0.0;
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
         if(objName != "heliProp"){
-            //if(objName != compName){
-                //std::cout << "compName = " << compName << std::endl;
-                //compName = objName;
                 std::cout << "Hit: " << objName << std::endl;
                 hit(callback->ctxt);
-            //}
-    /*else
-        compName = "";*/
-            /*if(crashTime == 0.0 || compName != objName){
-                crashTime = 0.0;
-                compName = objName;
-                std::cout << "Hit: " << objName << std::endl;
-                hit();
-            }*/
-            /*else{
-                crashTime += deltaT;
-            }
-
-            if(crashTime >= 0.3)
-                crashTime = 0.0;*/
         }
-    //else
-        //std::cout << std::endl;
-        /*if (objName == "mytarget") {
-            simulator->soundPlayed = BALLTARGET;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playTargetHit();
-            }
-            Target* target = static_cast<Target*>(callback->ctxt.theObject);
-            target->movePlacement();
-        }*/
     }
 }
 
