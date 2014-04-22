@@ -23,6 +23,7 @@ public:
     ServerToClient& getServerToClientData(void);
     void setDataFromClient(ClientToServer& data, int i);
     ClientToServer& getClientToServerData(void);
+    void rotateHeliProps(Ogre::Real t);
 };
 
 Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
@@ -36,8 +37,10 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     // helicoper(s)
     helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
     
-    if (!isSinglePlayer) {
-        for (int i = 1; i < NUM_PLAYERS; i++) {
+    for (int i = 1; i < NUM_PLAYERS; i++) {
+        if (isSinglePlayer) {
+            helis[i] = NULL;
+        } else {
             char name[100];
             sprintf(name, "heli%d", i);
             helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(0.0, 0.0, 45.0), 0.9, 0.1, "Game/Helicopter");
@@ -59,6 +62,14 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         level->addToSimulator();
         powerup->addToSimulator();
     }
+}
+
+void Game::rotateHeliProps(Ogre::Real t) {
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        if (helis[i]) {
+            helis[i]->animate(t);
+        }
+    } 
 }
 
 void Game::printNodes(Ogre::SceneNode::ChildNodeIterator it, Ogre::String indent){

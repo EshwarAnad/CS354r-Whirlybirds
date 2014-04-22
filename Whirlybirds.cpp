@@ -88,7 +88,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
         game->heli->rotate(-mMove*0.035);
         game->heli->updateTransform();
-        
+			
+        game->rotateHeliProps(evt.timeSinceLastFrame);
+ 
         // get a packet from the server, then set the ball's position
         if (isClient) {
             // get state of the game from the server
@@ -100,8 +102,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             // send the position of our helicopter to the server
             client->sendMsg(game->getClientToServerData());
         } else {
-			game->heli->animate(evt.timeSinceLastFrame);
-                
             // step the simulator
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
