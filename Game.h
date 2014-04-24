@@ -73,7 +73,6 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         level->addToSimulator();
         makeNewHeli(0);
         heli = helis[0];
-        powerup->addToSimulator();
     }
 }
 
@@ -221,7 +220,11 @@ void Game::spawnPowerup(void) {
 			z = 300.0;
 			break;
 	}
-	powerup = new Ball(nym, mgr, sim, 20.0, 1.0, Ogre::Vector3(x, 300.0, z), 1.0, 1.0, tex);
+
+    if (!isClient || isSinglePlayer) {
+		powerup = new Ball(nym, mgr, sim, 20.0, 1.0, Ogre::Vector3(x, 300.0, z), 1.0, 1.0, tex);
+		powerup->addToSimulator();
+	}
 }
 
 void Game::display(void) {
