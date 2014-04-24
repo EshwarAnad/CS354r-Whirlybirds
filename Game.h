@@ -133,14 +133,14 @@ ClientToServer& Game::getClientToServerData(void) {
 }
 
 void Game::setDataFromServer(ServerToClient& data) {
-    for (int i = 0; i < data.numPlaying; i++) {
+    for (int i = 0; i < data.meta.numPlaying; i++) {
         assert(data.heliPoses[i].exists && "server gave us a heli that doesn't exist!");
 
         int index = data.heliPoses[i].index;
 
         if (helis[index] == NULL) {
             makeNewHeli(index);
-        } else if (helis[index] != NULL && index == data.clientIndex) {
+        } else if (helis[index] != NULL && index == data.meta.clientIndex) {
             // TODO: this makes it so we can move our heli, but it also
             //  makes it so the server can't tell us how our heli should 
             //  behave (so we can go thru walls)
@@ -151,16 +151,16 @@ void Game::setDataFromServer(ServerToClient& data) {
         helis[index]->getNode().setOrientation(data.heliPoses[i].orient);
     }
     
-    heli = helis[data.clientIndex];
+    heli = helis[data.meta.clientIndex];
     
-    assert(data.clientIndex != 0 && "our heli is being set to the server's!");
+    assert(data.meta.clientIndex != 0 && "our heli is being set to the server's!");
     assert(heli != NULL && "we haven't received any data for our heli!");
 }
 
 ServerToClient& Game::getServerToClientData(void) {
-    sdata_out.sound = 0;
-    sdata_out.clientIndex = 0;
-    sdata_out.numPlaying = 0;
+    sdata_out.meta.sound = 0;
+    sdata_out.meta.clientIndex = 0;
+    sdata_out.meta.numPlaying = 0;
    
     int np = 0;
  
@@ -174,7 +174,7 @@ ServerToClient& Game::getServerToClientData(void) {
         } 
     }
 
-    sdata_out.numPlaying = np;
+    sdata_out.meta.numPlaying = np;
     
     for (int j = np; j < NUM_PLAYERS; j++) {
         sdata_out.heliPoses[j].exists = false;

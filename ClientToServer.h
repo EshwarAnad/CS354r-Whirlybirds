@@ -4,6 +4,6 @@
 
 class ClientToServer {
 public:
-    HeliPose pose;
+    HeliInfo pose;
 };
 

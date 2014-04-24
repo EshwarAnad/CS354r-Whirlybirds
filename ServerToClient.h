@@ -3,17 +3,21 @@
 #include <btBulletDynamicsCommon.h>
 #include "Server.h"
 
-struct HeliPose {
+struct HeliInfo {
     Ogre::Vector3 pos;
     Ogre::Quaternion orient;
     bool exists;
     int index;
 };
 
-struct ServerToClient {
+struct MetaData {
     int clientIndex; // set by the server, specific to the client it sends to
     int sound;
     int numPlaying;
-    HeliPose heliPoses[NUM_PLAYERS];
+};
+
+struct ServerToClient {
+    MetaData meta;
+    HeliInfo heliPoses[NUM_PLAYERS];
 };
 
