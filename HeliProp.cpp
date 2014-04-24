@@ -15,6 +15,7 @@ HeliProp::HeliProp(
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
+	sMgr = mgr;
     parent = p;
     if (mgr) {
         geom = mgr->createEntity(nym+"propgeom", "heliprop.mesh");
@@ -68,7 +69,12 @@ void HeliProp::update(){
     if (callback->ctxt.hit) {
         Ogre::String& objName = callback->ctxt.theObject->name;
         //std::cout << "Prop hit: " << objName << std::endl;
-        if(objName != parent->getChassName()){
+		if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
+			parent->setPowerup(objName);
+			sMgr->destroyEntity(objName);
+			sMgr->destroySceneNode(objName);
+			simulator->removeObject(callback->ctxt.theObject);
+        } else if (objName != parent->getChassName()) {
             if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
             hit(callback->ctxt);
         }

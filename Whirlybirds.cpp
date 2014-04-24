@@ -43,6 +43,8 @@ void Whirlybirds::createScene(void)
 	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
+bool powerupSpawn = false;
+
 bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     static Ogre::Real z_time = 0.0;
 	float xMove, yMove, zMove;
@@ -60,6 +62,20 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+		//check if powerup needs to spawn
+		if (mSceneMgr->hasSceneNode("speed") || mSceneMgr->hasSceneNode("power") || mSceneMgr->hasSceneNode("health") || mSceneMgr->hasSceneNode("shield")) {
+			time(&powerupTime);
+			powerupSpawn = true;
+		}
+
+		if (powerupSpawn) {
+			time(&currentTime);
+			if (difftime(currentTime, powerupTime) >= 20) {
+				game->spawnPowerup();
+				powerupSpawn = false;
+			}
+		}
+
         //check if helicopter is in bounds
         game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
         if(!game->heli->alive)
