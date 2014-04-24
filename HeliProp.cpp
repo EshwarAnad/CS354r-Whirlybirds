@@ -78,3 +78,7 @@ void HeliProp::update(){
 void HeliProp::hit(CollisionContext& ctxt){
     parent->hit(ctxt);
 }
+
+void HeliProp::setVisible(bool b){
+    rootNode->setVisible(b);
+}

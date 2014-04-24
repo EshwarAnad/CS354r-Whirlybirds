@@ -28,6 +28,7 @@ public:
     virtual void update();
     void hit(CollisionContext&);
     void spin(Ogre::Real);
+    void setVisible(bool);
 };
 
 #endif

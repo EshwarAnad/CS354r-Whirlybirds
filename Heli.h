@@ -34,7 +34,8 @@ protected:
 	bool shield;
 	Ogre::SceneManager* sMgr;
     bool outOfBounds;
-    float timeToDie;
+    float timeToDie;  //how long until death
+    float timeToLive; //how long until respawn
 
 public:
     Heli(
@@ -71,6 +72,9 @@ public:
     btVector3& convertToWorld(btVector3&);
     btVector3& convertToLocal(btVector3&);
     void inBounds(int, Ogre::Real);
+    void kill();
+    void respawn(Ogre::Vector3, Ogre::Real);
+    bool alive;
 };
 
 #endif

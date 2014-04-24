@@ -91,3 +91,7 @@ void HeliChass::update(){
 void HeliChass::hit(CollisionContext& ctxt){
     parent->hit(ctxt);
 }
+
+void HeliChass::setVisible(bool b){
+    rootNode->setVisible(b);
+}
