@@ -83,6 +83,5 @@ void UDPNetEnt::sendMsg(char *data, int len) {
 UDPNetEnt::~UDPNetEnt() {
     SDLNet_FreePacket(recPack);
     SDLNet_FreePacket(sendPack);
-    SDLNet_Quit();
 }
 

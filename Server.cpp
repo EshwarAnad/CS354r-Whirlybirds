@@ -30,7 +30,10 @@ Server::Server(int serverPort) {
 
 Server::~Server() {
     for (int i = 0; i < numConnected; i++) {
-        delete ents[i];
+        if (ents[i]) {
+            delete ents[i];
+            ents[i] = NULL;
+        }
     }
     SDLNet_Quit();
 }
@@ -70,22 +73,34 @@ int Server::awaitConnections(){
     return -1;
 }
 
+void Server::removeConnection(int index) {
+    assert(ents[index] && "can't remove a connection that doesn't exist!");
+    delete ents[index]; 
+    ents[index] = NULL;
+}
+
 void Server::sendMsg(ServerToClient& data) {
     int numBytes = sizeof(MetaData) + sizeof(HeliInfo)*data.meta.numPlaying;
 
     assert(numBytes < 512 && "UDP packet is 512 bytes... not sure if you can send more than that, broski");
     
     for (int i = 0; i < numConnected; i++) {
-        data.meta.clientIndex = i + 1;
-        ents[i]->sendMsg(reinterpret_cast<char*>(&data), numBytes);
+        if (ents[i]) {
+            data.meta.clientIndex = i + 1;
+            ents[i]->sendMsg(reinterpret_cast<char*>(&data), numBytes);
+        }
     }
 }
 
 bool Server::recMsg(ClientToServer& data, int index) {
     if (index < numConnected) {
+        if (ents[index] == NULL) {
+            // this could happen if a client that was connected is no longer connected
+            return false;
+        }
+
         return ents[index]->recMsg(reinterpret_cast<char*>(&data));
     }
     return false;
 }
-
 

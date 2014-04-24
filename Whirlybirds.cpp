@@ -136,6 +136,10 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
                             game->setDataFromClient(cdata, i+1);
+                            if (cdata.disconnecting) {
+                                server->removeConnection(i);
+                                printf("deleted connected to client #%d\n", i);
+                            }
                         }
                     }
                 }

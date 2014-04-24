@@ -38,7 +38,6 @@ Heli::Heli(
 	hasPowerup = false;
 	time(&currentTime);
 	sMgr = mgr;
-	si = sim;
 	outOfBounds = false;
 	timeToDie = 10.0;
 	alive = true;
@@ -258,7 +257,7 @@ void Heli::setPowerup(Ogre::String pwr) {
 	} else {
 		expirePowerup();
 		hasPowerup = true;
-		hShield = new Ball(name+"hShield", sMgr, si, 30.0, 1.0, sMgr->getSceneNode(name+"chass")->getPosition(), 1.0, 1.0, "Game/Shield");
+		hShield = new Ball(name+"hShield", sMgr, sim, 30.0, 1.0, sMgr->getSceneNode(name+"chass")->getPosition(), 1.0, 1.0, "Game/Shield");
 		sMgr->getSceneNode(name+"hShield")->getParent()->removeChild(name+"hShield");
 		rootNode->addChild(sMgr->getSceneNode(name+"hShield"));
 		hShield->addToSimulator();
@@ -274,7 +273,7 @@ void Heli::expirePowerup() {
 	if (shield) {
 		sMgr->destroyEntity(name+"hShield");
 		sMgr->destroySceneNode(name+"hShield");
-		si->removeObject(hShield);
+		sim->removeObject(hShield);
 	}
 	shield = false;
 	hasPowerup = false;
