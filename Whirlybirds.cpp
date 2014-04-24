@@ -82,13 +82,15 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 			yMove = evt.timeSinceLastFrame;
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 			yMove = -evt.timeSinceLastFrame;
-
-		game->heli->move(xMove, yMove, zMove);
         
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
-        game->heli->rotate(-mMove*0.035);
-        game->heli->updateTransform();
-			
+        
+        if (!isClient) {
+            game->heli->move(xMove, yMove, zMove);
+            game->heli->rotate(-mMove*0.035);
+            game->heli->updateTransform();
+	    }
+
         game->rotateHeliProps(evt.timeSinceLastFrame);
  
         // get a packet from the server, then set the ball's position
@@ -99,8 +101,13 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                 game->setDataFromServer(servData);
             }
                 
-            // send the position of our helicopter to the server
-            client->sendMsg(game->getClientToServerData());
+            // send the user input for our helicopter to the server
+            ClientToServer cdata;
+            cdata.xMove = xMove;
+            cdata.yMove = yMove;
+            cdata.zMove = zMove;
+            cdata.mMove = mMove;
+            client->sendMsg(cdata);
         } else {
             // step the simulator
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
@@ -118,7 +125,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                     server->sendMsg(game->getServerToClientData());
                     simulator->soundPlayed = NOSOUND;
                 
-                    // get the state of the clients' helicopters
+                    // get clients' user input
                     for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {

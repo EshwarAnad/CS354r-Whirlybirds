@@ -27,7 +27,6 @@ public:
     void setDataFromServer(ServerToClient& data);
     ServerToClient& getServerToClientData(void);
     void setDataFromClient(ClientToServer& data, int i);
-    ClientToServer& getClientToServerData(void);
     void rotateHeliProps(Ogre::Real t);
 	void spawnPowerup(void);
     void makeNewHeli(int index);
@@ -121,15 +120,9 @@ Game::~Game() {
 void Game::setDataFromClient(ClientToServer& data, int i) {
     assert(helis[i] != NULL && "we don't have a heli for this client!");
 
-    helis[i]->getNode().setPosition(data.pose.pos);
-    helis[i]->getNode().setOrientation(data.pose.orient);
-}
-
-ClientToServer& Game::getClientToServerData(void) {
-    cdata_out.pose.pos = heli->getNode().getPosition();
-    cdata_out.pose.orient = heli->getNode().getOrientation();
-    
-    return cdata_out;
+    helis[i]->move(data.xMove, data.yMove, data.zMove);
+    helis[i]->rotate(-data.mMove*0.035);
+    helis[i]->updateTransform();
 }
 
 void Game::setDataFromServer(ServerToClient& data) {
@@ -144,7 +137,7 @@ void Game::setDataFromServer(ServerToClient& data) {
             // TODO: this makes it so we can move our heli, but it also
             //  makes it so the server can't tell us how our heli should 
             //  behave (so we can go thru walls)
-            continue; 
+            //continue; 
         }
 
         helis[index]->getNode().setPosition(data.heliPoses[i].pos);
