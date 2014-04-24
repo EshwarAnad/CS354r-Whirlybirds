@@ -30,7 +30,7 @@ public:
     int numConnected;
     Server(int serverPort);
     ~Server();
-    void awaitConnections();
+    int awaitConnections();
     void sendMsg(ServerToClient& data);
     bool recMsg(ClientToServer& data, int index);
 };

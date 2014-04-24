@@ -10,7 +10,7 @@ SoundSystem::SoundSystem()
 
     // Load the music and begin playing
     music = Mix_LoadMUS("media/sound/HeartBeatMusic.wav");
-    Mix_PlayMusic(music, -1);
+    //Mix_PlayMusic(music, -1);
 
     // allocate 16 mixing channels
     Mix_AllocateChannels(24);

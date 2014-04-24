@@ -35,7 +35,7 @@ Server::~Server() {
     SDLNet_Quit();
 }
 
-void Server::awaitConnections(){
+int Server::awaitConnections(){
     if (numConnected < NUM_PLAYERS - 1) {
         if (TCPsocket TCPcsd = SDLNet_TCP_Accept(TCPsd)) {
             /*can now communicate with client using csd socket*/
@@ -59,12 +59,15 @@ void Server::awaitConnections(){
                 ents[numConnected]->initReceiving(32100 + numConnected);
                 
                 numConnected += 1;
+                return numConnected;
             }
             else {
                 fprintf(stderr, "SDLNet_TCP_GetPeerAddress: %s\n", SDLNet_GetError());
             }
         }
     }
+
+    return -1;
 }
 
 void Server::sendMsg(ServerToClient& data) {

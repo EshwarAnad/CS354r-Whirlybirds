@@ -24,7 +24,7 @@ Simulator::Simulator(){
 
     // Initialize the sound system
     soundSystem = new SoundSystem();
-    soundOn = true;
+    soundOn = false;
 }
 
 Simulator::~Simulator() {

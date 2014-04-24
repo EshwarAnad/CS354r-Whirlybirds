@@ -106,8 +106,13 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
             if (!isSinglePlayer) {
-                server->awaitConnections();
-                
+                int newClient = server->awaitConnections();
+               
+                if (newClient != -1) {
+                    assert(newClient != 0 && "we can't add the server player as a new player!");
+                    game->makeNewHeli(newClient);
+                }
+ 
                 if (server->numConnected > 0) {    
                     // send the state of the game to the client
                     server->sendMsg(game->getServerToClientData());
@@ -137,7 +142,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 		if (arg.key == OIS::KC_X) {
 			simulator->soundOn = !(simulator->soundOn);
 		} else if (arg.key == OIS::KC_C) {
-			simulator->soundSystem->playMusic();
+			//simulator->soundSystem->playMusic();
 		}
 	}
 	if (arg.key == OIS::KC_ESCAPE)
@@ -231,7 +236,9 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
         }
 
         printf("@#$ client starting up...\n");
-	}
+	} else {
+        printf("ERROR: client couldn't find server!\n");
+    }
     
 	return true;
 }
@@ -246,6 +253,7 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	
     simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
+    game->display();
     attachCamera();
  
 	gui->destroyMenu(false);

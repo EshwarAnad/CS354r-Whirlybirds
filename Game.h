@@ -16,6 +16,8 @@ public:
     Heli* heli; // our helicopter
     Level* level;
 	Ball* powerup;
+    Simulator* simulator;
+    Ogre::SceneManager* mSceneMgr;
     
     Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer);
     ~Game();
@@ -27,10 +29,16 @@ public:
     ClientToServer& getClientToServerData(void);
     void rotateHeliProps(Ogre::Real t);
 	void spawnPowerup(void);
+    void makeNewHeli(int index);
+
+    void display(void); // debugging
 };
 
 Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
+: simulator(simulator), mSceneMgr(mSceneMgr)
 {
+	srand(time(NULL));
+
 	sim = simulator;
 	mgr = mSceneMgr;
     static Ogre::Real WORLDSCALE = 3.0;
@@ -39,19 +47,6 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     // level 
     level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "");
 	
-    // helicopter(s)
-    helis[0] = new Heli("heli0", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
-    
-    for (int i = 1; i < NUM_PLAYERS; i++) {
-        if (isSinglePlayer) {
-            helis[i] = NULL;
-        } else {
-            char name[100];
-            sprintf(name, "heli%d", i);
-            helis[i] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
-        }
-    }
-
     // powerup
 	spawnPowerup();
 
@@ -60,13 +55,27 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
     printNodes(rootIt, "");
    
+    // helicopter(s)
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        helis[i] = NULL;
+    }
+
     if (!isClient || isSinglePlayer) { 
+        makeNewHeli(0);
         heli = helis[0];
         heli->addToSimulator();
         heli->setKinematic();
         level->addToSimulator();
         powerup->addToSimulator();
     }
+}
+
+void Game::makeNewHeli(int index) {
+    assert(index >= 0 || index < NUM_PLAYERS);
+            
+    char name[100];
+    sprintf(name, "heli%d", index);
+    helis[index] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
 }
 
 void Game::rotateHeliProps(Ogre::Real t) {
@@ -98,6 +107,8 @@ Game::~Game() {
 }
 
 void Game::setDataFromClient(ClientToServer& data, int i) {
+    assert(helis[i] != NULL && "we don't have a heli for this client!");
+
     helis[i]->getNode().setPosition(data.pose.pos);
     helis[i]->getNode().setOrientation(data.pose.orient);
 }
@@ -105,17 +116,33 @@ void Game::setDataFromClient(ClientToServer& data, int i) {
 ClientToServer& Game::getClientToServerData(void) {
     cdata_out.pose.pos = heli->getNode().getPosition();
     cdata_out.pose.orient = heli->getNode().getOrientation();
+    
     return cdata_out;
 }
 
 void Game::setDataFromServer(ServerToClient& data) {
     for (int i = 0; i < NUM_PLAYERS; i++) {
-        if (heli != NULL && i == data.clientIndex) continue;
+        if (!data.heliPoses[i].exists) {
+            continue;
+        }
+
+        if (helis[i] == NULL) {
+            makeNewHeli(i);
+        } else if (helis[i] != NULL && i == data.clientIndex) {
+            // TODO: this makes it so we can move our heli, but it also
+            //  makes it so the server can't tell us how our heli should 
+            //  behave (so we can go thru walls)
+            continue; 
+        }
+
         helis[i]->getNode().setPosition(data.heliPoses[i].pos);
         helis[i]->getNode().setOrientation(data.heliPoses[i].orient);
     }
     
     heli = helis[data.clientIndex];
+    
+    assert(data.clientIndex != 0 && "our heli is being set to the server's!");
+    assert(heli != NULL && "we haven't received any data for our heli!");
 }
 
 ServerToClient& Game::getServerToClientData(void) {
@@ -123,15 +150,18 @@ ServerToClient& Game::getServerToClientData(void) {
     sdata_out.clientIndex = 0;
     
     for (int i = 0; i < NUM_PLAYERS; i++) {
-        sdata_out.heliPoses[i].pos = helis[i]->getNode().getPosition();
-        sdata_out.heliPoses[i].orient = helis[i]->getNode().getOrientation();
+        sdata_out.heliPoses[i].exists = (helis[i] != NULL);
+
+        if (helis[i]) {
+            sdata_out.heliPoses[i].pos = helis[i]->getNode().getPosition();
+            sdata_out.heliPoses[i].orient = helis[i]->getNode().getOrientation();
+        }
     }
     
     return sdata_out;
 }
 
 void Game::spawnPowerup(void) {
-	srand (time(NULL));
 	int power = rand()%4;
 	Ogre::String nym;
 	Ogre::String tex;
@@ -171,4 +201,25 @@ void Game::spawnPowerup(void) {
 			break;
 	}
 	powerup = new Ball(nym, mgr, sim, 20.0, 1.0, Ogre::Vector3(x, 300.0, z), 1.0, 1.0, tex);
+}
+
+void Game::display(void) {
+    printf("Game state (%d players):\n", NUM_PLAYERS);
+
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        printf("  heli #%d\n", i);
+
+        if (helis[i] == NULL) {
+            printf("    (NULL)\n");
+            continue;
+        }
+        else if (heli == helis[i]) {
+            printf("    (this is our heli)\n");
+        }
+
+        printf("    loc: %f %f %f\n", 
+            helis[i]->getNode().getPosition().x,
+            helis[i]->getNode().getPosition().y,
+            helis[i]->getNode().getPosition().z);
+    }  
 }
