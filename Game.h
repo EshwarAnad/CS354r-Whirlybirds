@@ -10,6 +10,7 @@ protected:
     ClientToServer cdata_out;
 	Simulator* sim;
 	Ogre::SceneManager* mgr;
+    std::vector<Ogre::Vector3> positions;
 
 public:
 	Heli* helis[NUM_PLAYERS];
@@ -54,7 +55,13 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     Ogre::SceneNode* theRoot = mSceneMgr->getRootSceneNode();
     Ogre::SceneNode::ChildNodeIterator rootIt = theRoot->getChildIterator();
     printNodes(rootIt, "");
-   
+
+    // different spawn positions
+    positions.push_back(Ogre::Vector3(300,300,300));  
+    positions.push_back(Ogre::Vector3(-300,300,-300));  
+    positions.push_back(Ogre::Vector3(-59.59964, 512.620789, -469.511108));
+    positions.push_back(Ogre::Vector3(53.735020, 535.609009, -21.95671));
+
     // helicopter(s)
     for (int i = 0; i < NUM_PLAYERS; i++) {
         helis[i] = NULL;
@@ -75,7 +82,12 @@ void Game::makeNewHeli(int index) {
             
     char name[100];
     sprintf(name, "heli%d", index);
-    helis[index] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 300.0, 300.0), 0.9, 0.1, "Game/Helicopter");
+    
+    int pos = rand()%positions.size();
+
+    printf("added heli #%d at %d\n", index, pos);
+
+    helis[index] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, positions[pos], 0.9, 0.1, "Game/Helicopter");
 }
 
 void Game::rotateHeliProps(Ogre::Real t) {

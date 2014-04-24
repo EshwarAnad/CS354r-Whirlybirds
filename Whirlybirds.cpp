@@ -126,6 +126,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                         }
                     }
                 }
+            } else {
             }
         }
 	}
