@@ -133,22 +133,22 @@ ClientToServer& Game::getClientToServerData(void) {
 }
 
 void Game::setDataFromServer(ServerToClient& data) {
-    for (int i = 0; i < NUM_PLAYERS; i++) {
-        if (!data.heliPoses[i].exists) {
-            continue;
-        }
+    for (int i = 0; i < data.numPlaying; i++) {
+        assert(data.heliPoses[i].exists && "server gave us a heli that doesn't exist!");
 
-        if (helis[i] == NULL) {
-            makeNewHeli(i);
-        } else if (helis[i] != NULL && i == data.clientIndex) {
+        int index = data.heliPoses[i].index;
+
+        if (helis[index] == NULL) {
+            makeNewHeli(index);
+        } else if (helis[index] != NULL && index == data.clientIndex) {
             // TODO: this makes it so we can move our heli, but it also
             //  makes it so the server can't tell us how our heli should 
             //  behave (so we can go thru walls)
             continue; 
         }
 
-        helis[i]->getNode().setPosition(data.heliPoses[i].pos);
-        helis[i]->getNode().setOrientation(data.heliPoses[i].orient);
+        helis[index]->getNode().setPosition(data.heliPoses[i].pos);
+        helis[index]->getNode().setOrientation(data.heliPoses[i].orient);
     }
     
     heli = helis[data.clientIndex];
@@ -160,16 +160,26 @@ void Game::setDataFromServer(ServerToClient& data) {
 ServerToClient& Game::getServerToClientData(void) {
     sdata_out.sound = 0;
     sdata_out.clientIndex = 0;
-    
+    sdata_out.numPlaying = 0;
+   
+    int np = 0;
+ 
     for (int i = 0; i < NUM_PLAYERS; i++) {
-        sdata_out.heliPoses[i].exists = (helis[i] != NULL);
-
         if (helis[i]) {
-            sdata_out.heliPoses[i].pos = helis[i]->getNode().getPosition();
-            sdata_out.heliPoses[i].orient = helis[i]->getNode().getOrientation();
-        }
+            sdata_out.heliPoses[np].pos = helis[i]->getNode().getPosition();
+            sdata_out.heliPoses[np].orient = helis[i]->getNode().getOrientation();
+            sdata_out.heliPoses[np].index = i;
+            sdata_out.heliPoses[np].exists = true;
+            np += 1;
+        } 
     }
+
+    sdata_out.numPlaying = np;
     
+    for (int j = np; j < NUM_PLAYERS; j++) {
+        sdata_out.heliPoses[j].exists = false;
+    }
+
     return sdata_out;
 }
 
