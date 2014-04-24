@@ -49,6 +49,8 @@ protected:
     bool isClient;
     bool gameplay;
     bool isSinglePlayer;
+	time_t powerupTime;
+	time_t currentTime;
 
 	// Game Objects
     Game* game;

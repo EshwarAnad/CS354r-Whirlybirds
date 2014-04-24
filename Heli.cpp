@@ -31,8 +31,9 @@ Heli::Heli(
 	name = nym;
 	health = 100.0;
 	hasPowerup = false;
-	time(&powerupTime);
+	time(&currentTime);
 	sMgr = mgr;
+	si = sim;
 }
 
 void Heli::addToSimulator() {
@@ -56,7 +57,7 @@ void Heli::move(Ogre::Real x, Ogre::Real y, Ogre::Real z) {
 	time(&currentTime);
 	if (hasPowerup && difftime(currentTime, powerupTime) >= 30)
 		expirePowerup();
-	
+
 	if (x < 0.0) {
 		if (xSpeed > 0.0) {
 			x = -x;
@@ -202,24 +203,24 @@ void Heli::updateTransform(){
 void Heli::setPowerup(Ogre::String pwr) {
 	time(&powerupTime);
 
-	hasPowerup = true;
 	if (pwr == "speed") {
 		expirePowerup();
-		speedModifier = 3.0;
+		hasPowerup = true;
+		speedModifier = 2.5;
 	} else if (pwr == "power") {
 		expirePowerup();
+		hasPowerup = true;
 		powerModifier = 2.0;
 	} else if (pwr == "health") {
-		hasPowerup = false;
 		health = (health + 50 > 100) ? 100 : health + 50;
 	} else {
 		expirePowerup();
-		/*Ogre::SceneNode* s = new Ogre::SceneNode(sMgr, "shieldNode");
-		sMgr->createEntity("theshield", "sphere.mesh");
-		sMgr->getEntity("theshield")->setMaterialName("Game/shieldBall");
-		s->scale(200.0 * 0.01f, 200.0 * 0.01f, 200.0 * 0.01f);
-		sMgr->getSceneNode(name)->addChild(s);
-		s->setPosition(sMgr->getSceneNode(name)->getPosition());*/
+		hasPowerup = true;
+		hShield = new Ball(name+"hShield", sMgr, si, 30.0, 1.0, sMgr->getSceneNode(name+"chass")->getPosition(), 1.0, 1.0, "Game/Shield");
+		sMgr->getSceneNode(name+"hShield")->getParent()->removeChild(name+"hShield");
+		rootNode->addChild(sMgr->getSceneNode(name+"hShield"));
+		hShield->addToSimulator();
+		hShield->setKinematic();
 		shield = true;
 	}
 }
@@ -227,6 +228,11 @@ void Heli::setPowerup(Ogre::String pwr) {
 void Heli::expirePowerup() {
 	speedModifier = 1.0;
 	powerModifier = 1.0;
+	if (shield) {
+		sMgr->destroyEntity(name+"hShield");
+		sMgr->destroySceneNode(name+"hShield");
+		si->removeObject(hShield);
+	}
 	shield = false;
 	hasPowerup = false;
 }

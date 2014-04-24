@@ -5,9 +5,10 @@
 #include <Ogre.h>
 #include "HeliChass.h"
 #include "HeliProp.h"
+#include "Ball.h"
 
-#define maxXZSpeed 60.0
-#define maxYSpeed 30.0
+#define maxXZSpeed 80.0
+#define maxYSpeed 50.0
 #define maxYawSpeed 30.0
 #define speedIncrement 0.05
 #define speedBase 0.002
@@ -33,6 +34,8 @@ protected:
 	float powerModifier;
 	bool shield;
 	Ogre::SceneManager* sMgr;
+	Simulator* si;
+	Ball* hShield;
 
 public:
     Heli(

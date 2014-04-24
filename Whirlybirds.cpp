@@ -44,7 +44,6 @@ void Whirlybirds::createScene(void)
 }
 
 bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
-    
     static Ogre::Real z_time = 0.0;
 	float xMove, yMove, zMove;
 
