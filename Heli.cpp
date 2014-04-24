@@ -251,16 +251,18 @@ void Heli::hit(CollisionContext& ctxt){
 	Ogre::Vector3 temp = rootNode->getPosition();
 	btVector3 spdV(xSpeed, ySpeed, zSpeed);
 	btScalar mag = spdV.length();
-	spdV = spdV.normalize();
-	//Convert speed vector to world for collision handling
-	spdV = convertToWorld(spdV);
-	spdV = reflect(spdV, ctxt.normal);
-	//Convert back to local coords to update the speed vector of helicopter
-	spdV = convertToLocal(spdV);
-	spdV = mag * spdV;
-	xSpeed = spdV.getX();
-	ySpeed = spdV.getY();
-	zSpeed = spdV.getZ();
+	if(mag != 0.0){
+		spdV = spdV.normalize();
+		//Convert speed vector to world for collision handling
+		spdV = convertToWorld(spdV);
+		spdV = reflect(spdV, ctxt.normal);
+		//Convert back to local coords to update the speed vector of helicopter
+		spdV = convertToLocal(spdV);
+		spdV = mag * spdV;
+		xSpeed = spdV.getX();
+		ySpeed = spdV.getY();
+		zSpeed = spdV.getZ();
+	}
 	//Push the helicopter out of the object it's colliding with by translating along the object's normal
 	//This prevents the helicopter from getting stuck in the object
 	std::cout << "normal of hit object (" << ctxt.normal.getX() << ", " << ctxt.normal.getY() << ", " << ctxt.normal.getZ() << ")" << std::endl;
