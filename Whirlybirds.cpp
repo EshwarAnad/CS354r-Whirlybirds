@@ -253,7 +253,6 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	
     simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
-    game->display();
     attachCamera();
  
 	gui->destroyMenu(false);
