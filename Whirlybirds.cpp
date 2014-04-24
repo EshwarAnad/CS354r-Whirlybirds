@@ -160,9 +160,17 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 	}
 	if (arg.key == OIS::KC_ESCAPE)
     {
-        ServerToClient data;
-        data.meta.shutdown = true;
-        server->sendMsg(data);
+        if (!isSinglePlayer) {
+            if (isClient) {
+                ClientToServer data;
+                data.disconnecting = true;
+                client->sendMsg(data);
+            } else {            
+                ServerToClient data;
+                data.meta.shutdown = true;
+                server->sendMsg(data);
+            }
+        }
 
         mShutDown = true;
     }

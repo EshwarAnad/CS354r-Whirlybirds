@@ -11,6 +11,7 @@ Heli::Heli(
     Ogre::Real friction,
     Ogre::String tex = ""
     ) 
+: sim(sim)
 {
     rootNode = mgr->getRootSceneNode()->createChildSceneNode(nym);
     rootNode->setPosition(pos);
@@ -39,6 +40,39 @@ Heli::Heli(
 	sMgr = mgr;
 	outOfBounds = false;
 	timeToDie = 10.0;
+}
+
+void Heli::DestroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
+{
+   if ( !i_pSceneNode )
+   {
+      assert( false );
+      return;
+   }
+
+   // Destroy all the attached objects
+   Ogre::SceneNode::ObjectIterator itObject = i_pSceneNode->getAttachedObjectIterator();
+
+   while ( itObject.hasMoreElements() )
+   {
+      Ogre::MovableObject* pObject = static_cast<Ogre::MovableObject*>(itObject.getNext());
+      i_pSceneNode->getCreator()->destroyMovableObject( pObject );
+   }
+
+   // Recurse to child SceneNodes
+   Ogre::SceneNode::ChildNodeIterator itChild = i_pSceneNode->getChildIterator();
+
+   while ( itChild.hasMoreElements() )
+   {
+      Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+      DestroyAllAttachedMovableObjects( pChildNode );
+   }
+}
+
+Heli::~Heli() {
+    DestroyAllAttachedMovableObjects(rootNode);
+    rootNode->removeAndDestroyAllChildren();
+    sMgr->destroySceneNode(rootNode);
 }
 
 void Heli::addToSimulator() {
