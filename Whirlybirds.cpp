@@ -60,6 +60,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+        //check if helicopter is in bounds
+        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
+
 		xMove = 0.0,
 		yMove = 0.0,
 		zMove = 0.0;
@@ -81,13 +84,15 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 			yMove = evt.timeSinceLastFrame;
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
 			yMove = -evt.timeSinceLastFrame;
-
-		game->heli->move(xMove, yMove, zMove);
         
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
-        game->heli->rotate(-mMove*0.035);
-        game->heli->updateTransform();
-			
+        
+        if (!isClient) {
+            game->heli->move(xMove, yMove, zMove);
+            game->heli->rotate(-mMove*0.035);
+            game->heli->updateTransform();
+	    }
+
         game->rotateHeliProps(evt.timeSinceLastFrame);
  
         // get a packet from the server, then set the ball's position
@@ -98,8 +103,13 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                 game->setDataFromServer(servData);
             }
                 
-            // send the position of our helicopter to the server
-            client->sendMsg(game->getClientToServerData());
+            // send the user input for our helicopter to the server
+            ClientToServer cdata;
+            cdata.xMove = xMove;
+            cdata.yMove = yMove;
+            cdata.zMove = zMove;
+            cdata.mMove = mMove;
+            client->sendMsg(cdata);
         } else {
             // step the simulator
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
@@ -117,7 +127,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                     server->sendMsg(game->getServerToClientData());
                     simulator->soundPlayed = NOSOUND;
                 
-                    // get the state of the clients' helicopters
+                    // get clients' user input
                     for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
@@ -252,7 +262,6 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 	
     simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
-    game->display();
     attachCamera();
  
 	gui->destroyMenu(false);

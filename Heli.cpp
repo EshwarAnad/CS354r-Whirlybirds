@@ -19,7 +19,11 @@ Heli::Heli(
     chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, this, tex);
     Ogre::Vector3 off(0.0 * scale, 5.0 * scale, 2.5 * scale);
     prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, this, tex);
-	xTilt = 0.0;
+	
+    chass->skipCollisions.push_back(prop);
+    prop->skipCollisions.push_back(chass);
+
+    xTilt = 0.0;
 	zTilt = 0.0;
 	xSpeed = 0.0;
 	zSpeed = 0.0;
@@ -34,6 +38,8 @@ Heli::Heli(
 	time(&currentTime);
 	sMgr = mgr;
 	si = sim;
+	outOfBounds = false;
+	timeToDie = 10.0;
 }
 
 void Heli::addToSimulator() {
@@ -206,7 +212,7 @@ void Heli::setPowerup(Ogre::String pwr) {
 	if (pwr == "speed") {
 		expirePowerup();
 		hasPowerup = true;
-		speedModifier = 2.5;
+		speedModifier = 2.0;
 	} else if (pwr == "power") {
 		expirePowerup();
 		hasPowerup = true;
@@ -221,6 +227,7 @@ void Heli::setPowerup(Ogre::String pwr) {
 		rootNode->addChild(sMgr->getSceneNode(name+"hShield"));
 		hShield->addToSimulator();
 		hShield->setKinematic();
+    	hShield->skipCollisions.push_back(prop);
 		shield = true;
 	}
 }
@@ -287,4 +294,22 @@ Ogre::String Heli::getChassName() {
 
 Ogre::String Heli::getPropName() {
 	return prop->name;
+}
+
+void Heli::inBounds(int bound, Ogre::Real dt){
+	Ogre::Vector3 pos = rootNode->getPosition();
+	if(pos.x > bound || pos.x < -bound || pos.y < 0 || pos.z > bound || pos.z < -bound){
+		//out of bounds
+		outOfBounds = true;
+		timeToDie -= dt;
+		std::cout << "Return to battle or be destroyed! Time left: " << timeToDie << std::endl;
+
+	}
+
+	else if(outOfBounds){
+		//in bounds
+		outOfBounds = false;
+		timeToDie = 10.0;
+		std::cout << "Welcome back :)" << std::endl;
+	}
 }

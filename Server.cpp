@@ -72,6 +72,8 @@ int Server::awaitConnections(){
 
 void Server::sendMsg(ServerToClient& data) {
     int numBytes = sizeof(MetaData) + sizeof(HeliInfo)*data.meta.numPlaying;
+
+    assert(numBytes < 512 && "UDP packet is 512 bytes... not sure if you can send more than that, broski");
     
     for (int i = 0; i < numConnected; i++) {
         data.meta.clientIndex = i + 1;

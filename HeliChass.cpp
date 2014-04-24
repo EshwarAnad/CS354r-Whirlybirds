@@ -39,7 +39,7 @@ HeliChass::HeliChass(
     }
 
     //need to figure this out
-    shape = new btBoxShape(btVector3(scale*7.789/2, scale*4.353/2, scale*12.058/2));
+    shape = new btBoxShape(btVector3(scale*7.789/2, scale*4.353, scale*12.058/2));
     mass = m;
 }
 

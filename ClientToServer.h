@@ -4,6 +4,6 @@
 
 class ClientToServer {
 public:
-    HeliInfo pose;
+    float xMove, yMove, zMove, mMove;
 };
 

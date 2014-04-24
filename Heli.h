@@ -36,6 +36,8 @@ protected:
 	Ogre::SceneManager* sMgr;
 	Simulator* si;
 	Ball* hShield;
+    bool outOfBounds;
+    float timeToDie;
 
 public:
     Heli(
@@ -71,6 +73,7 @@ public:
     btVector3 reflect(btVector3& a, btVector3& b);
     btVector3& convertToWorld(btVector3&);
     btVector3& convertToLocal(btVector3&);
+    void inBounds(int, Ogre::Real);
 };
 
 #endif
