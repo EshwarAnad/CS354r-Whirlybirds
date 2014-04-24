@@ -23,7 +23,9 @@ class GameObject {
 		btVector3 inertia;
 		Ogre::Real restitution;
     	Ogre::Real friction;
+
 	public:
+        std::vector<GameObject*> skipCollisions;
         ContactSensorCallback* callback;
 		OgreMotionState* motionState;
 		Ogre::String name;

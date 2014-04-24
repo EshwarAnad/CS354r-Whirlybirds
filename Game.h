@@ -11,6 +11,8 @@ protected:
 	Simulator* sim;
 	Ogre::SceneManager* mgr;
     std::vector<Ogre::Vector3> positions;
+    bool isClient;
+    bool isSinglePlayer;
 
 public:
 	Heli* helis[NUM_PLAYERS];
@@ -35,7 +37,7 @@ public:
 };
 
 Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
-: simulator(simulator), mSceneMgr(mSceneMgr)
+: simulator(simulator), mSceneMgr(mSceneMgr), isClient(isClient), isSinglePlayer(isSinglePlayer)
 {
 	srand(time(NULL));
 
@@ -67,11 +69,9 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     }
 
     if (!isClient || isSinglePlayer) { 
+        level->addToSimulator();
         makeNewHeli(0);
         heli = helis[0];
-        heli->addToSimulator();
-        heli->setKinematic();
-        level->addToSimulator();
         powerup->addToSimulator();
     }
 }
@@ -84,9 +84,14 @@ void Game::makeNewHeli(int index) {
     
     int pos = rand()%positions.size();
 
-    printf("added heli #%d at %d\n", index, pos);
-
     helis[index] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, positions[pos], 0.9, 0.1, "Game/Helicopter");
+    
+    if (isSinglePlayer || !isClient) {
+        helis[index]->addToSimulator();
+        helis[index]->setKinematic();
+    }
+    
+    printf("added %s at %d\n", name, index, pos);
 }
 
 void Game::rotateHeliProps(Ogre::Real t) {

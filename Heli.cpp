@@ -19,7 +19,11 @@ Heli::Heli(
     chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, this, tex);
     Ogre::Vector3 off(0.0 * scale, 5.0 * scale, 2.5 * scale);
     prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, this, tex);
-	xTilt = 0.0;
+	
+    chass->skipCollisions.push_back(prop);
+    prop->skipCollisions.push_back(chass);
+
+    xTilt = 0.0;
 	zTilt = 0.0;
 	xSpeed = 0.0;
 	zSpeed = 0.0;
