@@ -39,8 +39,9 @@ HeliChass::HeliChass(
     }
 
     //need to figure this out
-    shape = new btBoxShape(btVector3(scale*7.789/2, scale*4.353, scale*12.058/2));
+    shape = new btBoxShape(btVector3(scale*7.789/2, scale*4.353/2, scale*12.058/2));
     mass = m;
+    
 }
 
 void HeliChass::updateNode(Ogre::String n){
@@ -62,37 +63,43 @@ void HeliChass::updateTransform() {
 }
 
 void HeliChass::update(){
-    if (callback->ctxt.hit) {
-        Ogre::String& objName = callback->ctxt.theObject->name;
-		if (objName == "speed") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			sMgr->destroySceneNode(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if (objName == "power") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			sMgr->destroySceneNode(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if (objName == "health") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			sMgr->destroySceneNode(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if (objName == "shield") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			sMgr->destroySceneNode(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if(objName != parent->getPropName()) {
-            if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
-            hit(callback->ctxt);
+    static Ogre::String compName = "";
+    if(callback->ctxt.theObject != NULL){
+            Ogre::String& objName = callback->ctxt.theObject->name;
+        if (callback->ctxt.hit) {
+    		if (objName == "speed") {
+    			parent->setPowerup(objName);
+    			sMgr->destroyEntity(objName);
+    			sMgr->destroySceneNode(objName);
+    			simulator->removeObject(callback->ctxt.theObject);
+    		} else if (objName == "power") {
+    			parent->setPowerup(objName);
+    			sMgr->destroyEntity(objName);
+    			sMgr->destroySceneNode(objName);
+    			simulator->removeObject(callback->ctxt.theObject);
+    		} else if (objName == "health") {
+    			parent->setPowerup(objName);
+    			sMgr->destroyEntity(objName);
+    			sMgr->destroySceneNode(objName);
+    			simulator->removeObject(callback->ctxt.theObject);
+    		} else if (objName == "shield") {
+    			parent->setPowerup(objName);
+    			sMgr->destroyEntity(objName);
+    			sMgr->destroySceneNode(objName);
+    			simulator->removeObject(callback->ctxt.theObject);
+    		} else if(objName != parent->getPropName()) {
+                hit(callback->ctxt, 1, objName == compName);
+                if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
+                compName = objName;
+            }
         }
+        else if(objName == compName)
+            compName = "";
     }
 }
 
-void HeliChass::hit(CollisionContext& ctxt){
-    parent->hit(ctxt);
+void HeliChass::hit(CollisionContext& ctxt, int damage, bool same){
+    parent->hit(ctxt, damage, same);
 }
 
 void HeliChass::setVisible(bool b){

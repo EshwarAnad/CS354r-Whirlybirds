@@ -38,7 +38,7 @@ HeliProp::HeliProp(
     }
 
     //need to figure this out
-    shape = new btBoxShape(btVector3(scale*8.374/2, scale*3.112, scale*8.358/2));
+    shape = new btBoxShape(btVector3(scale*8.374/2, scale*3.112/2, scale*8.358/2));
     mass = m;
 }
 
@@ -65,18 +65,24 @@ void HeliProp::updateTransform() {
 }
 
 void HeliProp::update(){
-    if (callback->ctxt.hit) {
+    /*static Ogre::String compName = "";
+    if(callback->ctxt.theObject != NULL){
         Ogre::String& objName = callback->ctxt.theObject->name;
-        //std::cout << "Prop hit: " << objName << std::endl;
-        if(objName != parent->getChassName()){
-            if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
-            hit(callback->ctxt);
+        if (callback->ctxt.hit) {
+            //std::cout << "Prop hit: " << objName << std::endl;
+            if(objName != parent->getChassName()){
+                hit(callback->ctxt, 1, compName == objName);
+                if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
+                compName = objName;
+            }
         }
-    }
+        else if(objName == compName)
+            compName = "";
+    }*/
 }
 
-void HeliProp::hit(CollisionContext& ctxt){
-    parent->hit(ctxt);
+void HeliProp::hit(CollisionContext& ctxt, int damage, bool same){
+    parent->hit(ctxt, damage, same);
 }
 
 void HeliProp::setVisible(bool b){

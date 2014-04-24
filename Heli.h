@@ -60,7 +60,7 @@ public:
     void updateTransform();
     void setPropRot(Ogre::Real, Ogre::Real, Ogre::Real, Ogre::Real);
 	void rotate(Ogre::Real);
-    void hit(CollisionContext&);
+    void hit(CollisionContext&, int, bool);
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();

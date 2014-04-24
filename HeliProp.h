@@ -26,7 +26,7 @@ public:
         );
     virtual void updateTransform();
     virtual void update();
-    void hit(CollisionContext&);
+    void hit(CollisionContext&, int, bool);
     void spin(Ogre::Real);
     void setVisible(bool);
 };

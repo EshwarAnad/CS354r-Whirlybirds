@@ -246,12 +246,17 @@ void Heli::expirePowerup() {
 	hasPowerup = false;
 }
 
-void Heli::hit(CollisionContext& ctxt){
-	std::cout << "Taking damage o noes" << std::endl;
+void Heli::hit(CollisionContext& ctxt, int damage, bool same){
+	if(!same){
+		std::cout << "Taking damage o noes" << std::endl;
+	}
+	if(health <= 0)
+		kill();
 	Ogre::Vector3 temp = rootNode->getPosition();
 	btVector3 spdV(xSpeed, ySpeed, zSpeed);
 	btScalar mag = spdV.length();
-	if(mag != 0.0){ //make sure the helicopter is moving or you will get NaN!
+	if(mag != 0.0 && !same){ //make sure the helicopter is moving or you will get NaN!
+		//also make sure the object being collided with is not the same!
 		spdV = spdV.normalize();
 		//Convert speed vector to world for collision handling
 		spdV = convertToWorld(spdV);
@@ -332,6 +337,7 @@ void Heli::kill(){
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt){
 	if(timeToLive <= 0){
 		alive = true;
+		health = 100;
 		chass->setVisible(true);
 		prop->setVisible(true);
 		rootNode->setPosition(pos);
