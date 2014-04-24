@@ -102,6 +102,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             ServerToClient servData;
             if (client->recMsg(servData)) {
                 game->setDataFromServer(servData);
+                if (servData.meta.shutdown) {
+                    mShutDown = true;
+                }
             }
                 
             // send the user input for our helicopter to the server
@@ -116,11 +119,11 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
             if (!isSinglePlayer) {
-                int newClient = server->awaitConnections();
+                int newClientIndex = server->awaitConnections();
                
-                if (newClient != -1) {
-                    assert(newClient != 0 && "we can't add the server player as a new player!");
-                    game->makeNewHeli(newClient);
+                if (newClientIndex != -1) {
+                    assert(newClientIndex != 0 && "we can't add the server player as a new player!");
+                    game->makeNewHeli(newClientIndex);
                 }
  
                 if (server->numConnected > 0) {    
@@ -157,6 +160,10 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 	}
 	if (arg.key == OIS::KC_ESCAPE)
     {
+        ServerToClient data;
+        data.meta.shutdown = true;
+        server->sendMsg(data);
+
         mShutDown = true;
     }
 	return true;
