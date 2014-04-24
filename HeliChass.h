@@ -27,6 +27,7 @@ public:
     virtual void updateTransform();
     virtual void update();
     void hit(CollisionContext&);
+    void setVisible(bool);
 };
 
 #endif

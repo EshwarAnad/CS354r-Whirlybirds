@@ -67,21 +67,24 @@ void HeliChass::update(){
 		if (objName == "speed") {
 			parent->setPowerup(objName);
 			sMgr->destroyEntity(objName);
+			sMgr->destroySceneNode(objName);
 			simulator->removeObject(callback->ctxt.theObject);
 		} else if (objName == "power") {
 			parent->setPowerup(objName);
 			sMgr->destroyEntity(objName);
+			sMgr->destroySceneNode(objName);
 			simulator->removeObject(callback->ctxt.theObject);
 		} else if (objName == "health") {
 			parent->setPowerup(objName);
 			sMgr->destroyEntity(objName);
+			sMgr->destroySceneNode(objName);
 			simulator->removeObject(callback->ctxt.theObject);
 		} else if (objName == "shield") {
 			parent->setPowerup(objName);
 			sMgr->destroyEntity(objName);
+			sMgr->destroySceneNode(objName);
 			simulator->removeObject(callback->ctxt.theObject);
-		}
-        if(objName != parent->getPropName()){
+		} else if(objName != parent->getPropName()) {
             if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
             hit(callback->ctxt);
         }
@@ -90,4 +93,8 @@ void HeliChass::update(){
 
 void HeliChass::hit(CollisionContext& ctxt){
     parent->hit(ctxt);
+}
+
+void HeliChass::setVisible(bool b){
+    rootNode->setVisible(b);
 }

@@ -5,9 +5,10 @@
 #include <Ogre.h>
 #include "HeliChass.h"
 #include "HeliProp.h"
+#include "Ball.h"
 
-#define maxXZSpeed 60.0
-#define maxYSpeed 30.0
+#define maxXZSpeed 80.0
+#define maxYSpeed 50.0
 #define maxYawSpeed 30.0
 #define speedIncrement 0.05
 #define speedBase 0.002
@@ -31,9 +32,11 @@ protected:
 	float powerModifier;
 	bool shield;
 	Ogre::SceneManager* sMgr;
-    bool outOfBounds;
-    float timeToDie;
     Simulator* sim;
+	Ball* hShield;
+    bool outOfBounds;
+    float timeToDie;  //how long until death
+    float timeToLive; //how long until respawn
 
 public:
     HeliChass* chass;
@@ -75,6 +78,9 @@ public:
     btVector3& convertToWorld(btVector3&);
     btVector3& convertToLocal(btVector3&);
     void inBounds(int, Ogre::Real);
+    void kill();
+    void respawn(Ogre::Vector3, Ogre::Real);
+    bool alive;
 };
 
 #endif

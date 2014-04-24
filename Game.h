@@ -32,6 +32,7 @@ public:
     void rotateHeliProps(Ogre::Real t);
 	void spawnPowerup(void);
     void makeNewHeli(int index);
+    Ogre::Vector3 getSpawnPos();
 
     void display(void); // debugging
 };
@@ -263,4 +264,9 @@ void Game::display(void) {
             helis[i]->getNode().getPosition().y,
             helis[i]->getNode().getPosition().z);
     }  
+}
+
+Ogre::Vector3 Game::getSpawnPos(){
+    int pos = rand()%positions.size();
+    return positions[pos];
 }
