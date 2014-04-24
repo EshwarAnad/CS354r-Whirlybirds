@@ -61,6 +61,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+        //check if helicopter is in bounds
+        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
+
 		xMove = 0.0,
 		yMove = 0.0,
 		zMove = 0.0;

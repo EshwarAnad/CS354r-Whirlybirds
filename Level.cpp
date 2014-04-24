@@ -88,3 +88,7 @@ void Level::debug(Ogre::String& name, Ogre::Vector3& bPos, Ogre::Vector3& bDim, 
 	std::cout << "Rot = (" << bRot.x << ", " << bRot.y << ", " << bRot.z << ")" << std::endl; 
 	std::cout << std::endl;
 }
+
+int Level::getBounds(){
+	return 3.0*MAPSIZE/2.0;
+}

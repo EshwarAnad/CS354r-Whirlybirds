@@ -38,7 +38,7 @@ HeliProp::HeliProp(
     }
 
     //need to figure this out
-    shape = new btBoxShape(btVector3(scale*8.374/2, scale*3.112/2, scale*8.358/2));
+    shape = new btBoxShape(btVector3(scale*8.374/2, scale*3.112, scale*8.358/2));
     mass = m;
 }
 
@@ -65,8 +65,13 @@ void HeliProp::updateTransform() {
 }
 
 void HeliProp::update(){
-    if (this->callback->ctxt.hit) {
-        Ogre::String& objName = this->callback->ctxt.theObject->name;
+    if (callback->ctxt.hit) {
+        Ogre::String& objName = callback->ctxt.theObject->name;
+        //std::cout << "Prop hit: " << objName << std::endl;
+        if(objName != parent->getChassName()){
+            if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
+            hit(callback->ctxt);
+        }
     }
 }
 
