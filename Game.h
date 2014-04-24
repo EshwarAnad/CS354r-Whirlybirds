@@ -11,6 +11,8 @@ protected:
 	Simulator* sim;
 	Ogre::SceneManager* mgr;
     std::vector<Ogre::Vector3> positions;
+    bool isClient;
+    bool isSinglePlayer;
 
 public:
 	Heli* helis[NUM_PLAYERS];
@@ -27,7 +29,6 @@ public:
     void setDataFromServer(ServerToClient& data);
     ServerToClient& getServerToClientData(void);
     void setDataFromClient(ClientToServer& data, int i);
-    ClientToServer& getClientToServerData(void);
     void rotateHeliProps(Ogre::Real t);
 	void spawnPowerup(void);
     void makeNewHeli(int index);
@@ -37,7 +38,7 @@ public:
 };
 
 Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer)
-: simulator(simulator), mSceneMgr(mSceneMgr)
+: simulator(simulator), mSceneMgr(mSceneMgr), isClient(isClient), isSinglePlayer(isSinglePlayer)
 {
 	srand(time(NULL));
 
@@ -69,11 +70,9 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     }
 
     if (!isClient || isSinglePlayer) { 
+        level->addToSimulator();
         makeNewHeli(0);
         heli = helis[0];
-        heli->addToSimulator();
-        heli->setKinematic();
-        level->addToSimulator();
         powerup->addToSimulator();
     }
 }
@@ -86,9 +85,14 @@ void Game::makeNewHeli(int index) {
     
     int pos = rand()%positions.size();
 
-    printf("added heli #%d at %d\n", index, pos);
-
     helis[index] = new Heli(name, mSceneMgr, simulator, 3.0, 1.0, positions[pos], 0.9, 0.1, "Game/Helicopter");
+    
+    if (isSinglePlayer || !isClient) {
+        helis[index]->addToSimulator();
+        helis[index]->setKinematic();
+    }
+    
+    printf("added %s at %d\n", name, index, pos);
 }
 
 void Game::rotateHeliProps(Ogre::Real t) {
@@ -122,15 +126,9 @@ Game::~Game() {
 void Game::setDataFromClient(ClientToServer& data, int i) {
     assert(helis[i] != NULL && "we don't have a heli for this client!");
 
-    helis[i]->getNode().setPosition(data.pose.pos);
-    helis[i]->getNode().setOrientation(data.pose.orient);
-}
-
-ClientToServer& Game::getClientToServerData(void) {
-    cdata_out.pose.pos = heli->getNode().getPosition();
-    cdata_out.pose.orient = heli->getNode().getOrientation();
-    
-    return cdata_out;
+    helis[i]->move(data.xMove, data.yMove, data.zMove);
+    helis[i]->rotate(-data.mMove*0.035);
+    helis[i]->updateTransform();
 }
 
 void Game::setDataFromServer(ServerToClient& data) {
@@ -145,7 +143,7 @@ void Game::setDataFromServer(ServerToClient& data) {
             // TODO: this makes it so we can move our heli, but it also
             //  makes it so the server can't tell us how our heli should 
             //  behave (so we can go thru walls)
-            continue; 
+            //continue; 
         }
 
         helis[index]->getNode().setPosition(data.heliPoses[i].pos);
