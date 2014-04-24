@@ -251,7 +251,7 @@ void Heli::hit(CollisionContext& ctxt){
 	Ogre::Vector3 temp = rootNode->getPosition();
 	btVector3 spdV(xSpeed, ySpeed, zSpeed);
 	btScalar mag = spdV.length();
-	if(mag != 0.0){
+	if(mag != 0.0){ //make sure the helicopter is moving or you will get NaN!
 		spdV = spdV.normalize();
 		//Convert speed vector to world for collision handling
 		spdV = convertToWorld(spdV);
@@ -265,10 +265,7 @@ void Heli::hit(CollisionContext& ctxt){
 	}
 	//Push the helicopter out of the object it's colliding with by translating along the object's normal
 	//This prevents the helicopter from getting stuck in the object
-	std::cout << "normal of hit object (" << ctxt.normal.getX() << ", " << ctxt.normal.getY() << ", " << ctxt.normal.getZ() << ")" << std::endl;
-	std::cout << "Our position (" << temp.x << ", " << temp.y << ", " << temp.z << ")" << std::endl;
 	rootNode->setPosition(temp + .01 * Ogre::Vector3(ctxt.normal.getX(), ctxt.normal.getY(), ctxt.normal.getZ()));
-	std::cout << "?" << std::endl;
 }
 
 btVector3 Heli::reflect(btVector3& a, btVector3& b){
