@@ -33,6 +33,8 @@ Heli::Heli(
 	hasPowerup = false;
 	time(&powerupTime);
 	sMgr = mgr;
+	outOfBounds = false;
+	timeToDie = 10.0;
 }
 
 void Heli::addToSimulator() {
@@ -281,4 +283,22 @@ Ogre::String Heli::getChassName() {
 
 Ogre::String Heli::getPropName() {
 	return prop->name;
+}
+
+void Heli::inBounds(int bound, Ogre::Real dt){
+	Ogre::Vector3 pos = rootNode->getPosition();
+	if(pos.x > bound || pos.x < -bound || pos.y < 0 || pos.z > bound || pos.z < -bound){
+		//out of bounds
+		outOfBounds = true;
+		timeToDie -= dt;
+		std::cout << "Return to battle or be destroyed! Time left: " << timeToDie << std::endl;
+
+	}
+
+	else if(outOfBounds){
+		//in bounds
+		outOfBounds = false;
+		timeToDie = 10.0;
+		std::cout << "Welcome back :)" << std::endl;
+	}
 }
