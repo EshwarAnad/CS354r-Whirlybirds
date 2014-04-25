@@ -10,6 +10,7 @@ class HeliProp : public GameObject {
 protected:
     void updateNode(Ogre::String);
     Heli* parent;
+	Ogre::SceneManager* sMgr;
 
 public:
     HeliProp(

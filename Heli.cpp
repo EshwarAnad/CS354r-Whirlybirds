@@ -11,6 +11,7 @@ Heli::Heli(
     Ogre::Real friction,
     Ogre::String tex = ""
     ) 
+: sim(sim)
 {
     rootNode = mgr->getRootSceneNode()->createChildSceneNode(nym);
     rootNode->setPosition(pos);
@@ -37,10 +38,42 @@ Heli::Heli(
 	hasPowerup = false;
 	time(&currentTime);
 	sMgr = mgr;
-	si = sim;
 	outOfBounds = false;
 	timeToDie = 10.0;
 	alive = true;
+}
+
+void Heli::DestroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
+{
+   if ( !i_pSceneNode )
+   {
+      assert( false );
+      return;
+   }
+
+   // Destroy all the attached objects
+   Ogre::SceneNode::ObjectIterator itObject = i_pSceneNode->getAttachedObjectIterator();
+
+   while ( itObject.hasMoreElements() )
+   {
+      Ogre::MovableObject* pObject = static_cast<Ogre::MovableObject*>(itObject.getNext());
+      i_pSceneNode->getCreator()->destroyMovableObject( pObject );
+   }
+
+   // Recurse to child SceneNodes
+   Ogre::SceneNode::ChildNodeIterator itChild = i_pSceneNode->getChildIterator();
+
+   while ( itChild.hasMoreElements() )
+   {
+      Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+      DestroyAllAttachedMovableObjects( pChildNode );
+   }
+}
+
+Heli::~Heli() {
+    DestroyAllAttachedMovableObjects(rootNode);
+    rootNode->removeAndDestroyAllChildren();
+    sMgr->destroySceneNode(rootNode);
 }
 
 void Heli::addToSimulator() {
@@ -224,7 +257,7 @@ void Heli::setPowerup(Ogre::String pwr) {
 	} else {
 		expirePowerup();
 		hasPowerup = true;
-		hShield = new Ball(name+"hShield", sMgr, si, 30.0, 1.0, sMgr->getSceneNode(name+"chass")->getPosition(), 1.0, 1.0, "Game/Shield");
+		hShield = new Ball(name+"hShield", sMgr, sim, 30.0, 1.0, sMgr->getSceneNode(name+"chass")->getPosition(), 1.0, 1.0, "Game/Shield");
 		sMgr->getSceneNode(name+"hShield")->getParent()->removeChild(name+"hShield");
 		rootNode->addChild(sMgr->getSceneNode(name+"hShield"));
 		hShield->addToSimulator();
@@ -240,7 +273,7 @@ void Heli::expirePowerup() {
 	if (shield) {
 		sMgr->destroyEntity(name+"hShield");
 		sMgr->destroySceneNode(name+"hShield");
-		si->removeObject(hShield);
+		sim->removeObject(hShield);
 	}
 	shield = false;
 	hasPowerup = false;

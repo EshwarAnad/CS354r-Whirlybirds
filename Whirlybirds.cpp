@@ -43,6 +43,8 @@ void Whirlybirds::createScene(void)
 	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
+bool powerupSpawn = false;
+
 bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     static Ogre::Real z_time = 0.0;
 	float xMove, yMove, zMove;
@@ -60,6 +62,20 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+		//check if powerup needs to spawn
+		if (mSceneMgr->hasSceneNode("speed") || mSceneMgr->hasSceneNode("power") || mSceneMgr->hasSceneNode("health") || mSceneMgr->hasSceneNode("shield")) {
+			time(&powerupTime);
+			powerupSpawn = true;
+		}
+
+		if (powerupSpawn) {
+			time(&currentTime);
+			if (difftime(currentTime, powerupTime) >= 20) {
+				game->spawnPowerup();
+				powerupSpawn = false;
+			}
+		}
+
         //check if helicopter is in bounds
         game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
         if(!game->heli->alive)
@@ -102,6 +118,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             ServerToClient servData;
             if (client->recMsg(servData)) {
                 game->setDataFromServer(servData);
+                if (servData.meta.shutdown) {
+                    mShutDown = true;
+                }
             }
                 
             // send the user input for our helicopter to the server
@@ -116,11 +135,11 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
             if (!isSinglePlayer) {
-                int newClient = server->awaitConnections();
+                int newClientIndex = server->awaitConnections();
                
-                if (newClient != -1) {
-                    assert(newClient != 0 && "we can't add the server player as a new player!");
-                    game->makeNewHeli(newClient);
+                if (newClientIndex != -1) {
+                    assert(newClientIndex != 0 && "we can't add the server player as a new player!");
+                    game->makeNewHeli(newClientIndex);
                 }
  
                 if (server->numConnected > 0) {    
@@ -133,6 +152,10 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
                             game->setDataFromClient(cdata, i+1);
+                            if (cdata.disconnecting) {
+                                server->removeConnection(i);
+                                printf("deleted connected to client #%d\n", i);
+                            }
                         }
                     }
                 }
@@ -157,6 +180,18 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 	}
 	if (arg.key == OIS::KC_ESCAPE)
     {
+        if (!isSinglePlayer) {
+            if (isClient) {
+                ClientToServer data;
+                data.disconnecting = true;
+                client->sendMsg(data);
+            } else {            
+                ServerToClient data;
+                data.meta.shutdown = true;
+                server->sendMsg(data);
+            }
+        }
+
         mShutDown = true;
     }
 	return true;

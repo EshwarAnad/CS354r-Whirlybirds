@@ -73,7 +73,6 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         level->addToSimulator();
         makeNewHeli(0);
         heli = helis[0];
-        powerup->addToSimulator();
     }
 }
 
@@ -124,14 +123,30 @@ Game::~Game() {
 }
 
 void Game::setDataFromClient(ClientToServer& data, int i) {
-    assert(helis[i] != NULL && "we don't have a heli for this client!");
+    if (helis[i] == NULL) {
+        // this can happen if a client has disconnected, but we still get a few packets from them
+        printf("we don't have a heli for client #%d!", i);
+        // assert(helis[i] != NULL && "we don't have a heli for this client!");
+        return;
+    }
 
-    helis[i]->move(data.xMove, data.yMove, data.zMove);
-    helis[i]->rotate(-data.mMove*0.035);
-    helis[i]->updateTransform();
+    if (data.disconnecting) {
+        printf("removing heli from %d\n", i);
+        simulator->removeObject(helis[i]->chass);
+        simulator->removeObject(helis[i]->prop);
+        delete helis[i];
+        helis[i] = NULL;
+        printf("removed heli from %d\n", i);
+    } else {
+        helis[i]->move(data.xMove, data.yMove, data.zMove);
+        helis[i]->rotate(-data.mMove*0.035);
+        helis[i]->updateTransform();
+    }
 }
 
 void Game::setDataFromServer(ServerToClient& data) {
+    bool updatedHelis[NUM_PLAYERS] = {0};
+
     for (int i = 0; i < data.meta.numPlaying; i++) {
         assert(data.heliPoses[i].exists && "server gave us a heli that doesn't exist!");
 
@@ -139,17 +154,22 @@ void Game::setDataFromServer(ServerToClient& data) {
 
         if (helis[index] == NULL) {
             makeNewHeli(index);
-        } else if (helis[index] != NULL && index == data.meta.clientIndex) {
-            // TODO: this makes it so we can move our heli, but it also
-            //  makes it so the server can't tell us how our heli should 
-            //  behave (so we can go thru walls)
-            //continue; 
-        }
-
+        } 
+        
         helis[index]->getNode().setPosition(data.heliPoses[i].pos);
         helis[index]->getNode().setOrientation(data.heliPoses[i].orient);
+        updatedHelis[index] = true;
     }
-    
+   
+    for (int i = 0; i < NUM_PLAYERS; i++) {
+        if (!updatedHelis[i] && helis[i] != NULL) {
+            printf("removing heli from %d\n", i);
+            delete helis[i];
+            helis[i] = NULL;
+            printf("removed heli from %d\n", i);
+        }
+    }
+ 
     heli = helis[data.meta.clientIndex];
     
     assert(data.meta.clientIndex != 0 && "our heli is being set to the server's!");
@@ -221,7 +241,11 @@ void Game::spawnPowerup(void) {
 			z = 300.0;
 			break;
 	}
-	powerup = new Ball(nym, mgr, sim, 20.0, 1.0, Ogre::Vector3(x, 300.0, z), 1.0, 1.0, tex);
+
+    if (!isClient || isSinglePlayer) {
+		powerup = new Ball(nym, mgr, sim, 20.0, 1.0, Ogre::Vector3(x, 300.0, z), 1.0, 1.0, tex);
+		powerup->addToSimulator();
+	}
 }
 
 void Game::display(void) {

@@ -18,8 +18,6 @@
 
 class Heli {
 protected:
-    HeliChass* chass;
-    HeliProp* prop;
     Ogre::SceneNode* rootNode;
     bool fullMove;
 	Ogre::Real xTilt;
@@ -34,13 +32,15 @@ protected:
 	float powerModifier;
 	bool shield;
 	Ogre::SceneManager* sMgr;
-	Simulator* si;
+    Simulator* sim;
 	Ball* hShield;
     bool outOfBounds;
     float timeToDie;  //how long until death
     float timeToLive; //how long until respawn
 
 public:
+    HeliChass* chass;
+    HeliProp* prop;
     Heli(
         Ogre::String nym, 
         Ogre::SceneManager* mgr, 
@@ -52,6 +52,9 @@ public:
         Ogre::Real friction,
         Ogre::String
         );
+    ~Heli();
+
+    void DestroyAllAttachedMovableObjects(Ogre::SceneNode*);
     void addToSimulator();
     void setKinematic();
     void move(Ogre::Real, Ogre::Real, Ogre::Real);

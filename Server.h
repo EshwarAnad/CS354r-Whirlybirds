@@ -33,5 +33,6 @@ public:
     int awaitConnections();
     void sendMsg(ServerToClient& data);
     bool recMsg(ClientToServer& data, int index);
+    void removeConnection(int index);
 };
 

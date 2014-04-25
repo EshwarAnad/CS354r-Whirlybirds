@@ -67,34 +67,20 @@ void HeliChass::update(){
     if(callback->ctxt.theObject != NULL){
             Ogre::String& objName = callback->ctxt.theObject->name;
         if (callback->ctxt.hit) {
-    		if (objName == "speed") {
+            Ogre::String& objName = callback->ctxt.theObject->name;
+    		if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
     			parent->setPowerup(objName);
     			sMgr->destroyEntity(objName);
     			sMgr->destroySceneNode(objName);
     			simulator->removeObject(callback->ctxt.theObject);
-    		} else if (objName == "power") {
-    			parent->setPowerup(objName);
-    			sMgr->destroyEntity(objName);
-    			sMgr->destroySceneNode(objName);
-    			simulator->removeObject(callback->ctxt.theObject);
-    		} else if (objName == "health") {
-    			parent->setPowerup(objName);
-    			sMgr->destroyEntity(objName);
-    			sMgr->destroySceneNode(objName);
-    			simulator->removeObject(callback->ctxt.theObject);
-    		} else if (objName == "shield") {
-    			parent->setPowerup(objName);
-    			sMgr->destroyEntity(objName);
-    			sMgr->destroySceneNode(objName);
-    			simulator->removeObject(callback->ctxt.theObject);
-    		} else if(objName != parent->getPropName()) {
+		    } else if(objName != parent->getPropName()) {
                 hit(callback->ctxt, 1, objName == compName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;
             }
         }
         else if(objName == compName)
-            compName = "";
+                compName = "";
     }
 }
 
