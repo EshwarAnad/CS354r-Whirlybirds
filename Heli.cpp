@@ -303,7 +303,7 @@ void Heli::hit(CollisionContext& ctxt, int damage, bool same){
 	}
 	//Push the helicopter out of the object it's colliding with by translating along the object's normal
 	//This prevents the helicopter from getting stuck in the object
-	rootNode->setPosition(temp + .01 * Ogre::Vector3(ctxt.normal.getX(), ctxt.normal.getY(), ctxt.normal.getZ()));
+	rootNode->setPosition(temp + 1.0 * Ogre::Vector3(ctxt.normal.getX(), ctxt.normal.getY(), ctxt.normal.getZ()));
 }
 
 btVector3 Heli::reflect(btVector3& a, btVector3& b){
@@ -338,22 +338,27 @@ Ogre::String Heli::getPropName() {
 	return prop->name;
 }
 
-void Heli::inBounds(int bound, Ogre::Real dt){
+void Heli::inBounds(int bound, Ogre::Real dt, GUI* gui){
 	Ogre::Vector3 pos = rootNode->getPosition();
 	if(alive && (pos.x > bound || pos.x < -bound || pos.y < 0 || pos.z > bound || pos.z < -bound)){
 		//out of bounds
 		outOfBounds = true;
 		timeToDie -= dt;
-		std::cout << "Return to battle or be destroyed! Time left: " << timeToDie << std::endl;
+		std::ostringstream stream;
+		stream << "Return to battle or be destroyed! Time left: " << std::fixed <<  std::setprecision(1) << timeToDie;
+		gui->setGameMessage(stream);
+		gui->setGameMessageVisible(true);
+
 		if(timeToDie <= 0)
 			kill();
 	}
 
 	else if(alive && outOfBounds){
+		gui->setGameMessageVisible(false);
 		//in bounds
 		outOfBounds = false;
 		timeToDie = 10.0;
-		std::cout << "Welcome back :)" << std::endl;
+		//std::cout << "Welcome back :)" << std::endl;
 	}
 }
 
@@ -367,14 +372,20 @@ void Heli::kill(){
 	rootNode->setPosition(0, -1000, 0);
 }
 
-void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt){
+void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 	if(timeToLive <= 0){
+		gui->setGameMessageVisible(false);
 		alive = true;
 		health = 100;
 		chass->setVisible(true);
 		prop->setVisible(true);
 		rootNode->setPosition(pos);
 	}
-	else
+	else{
 		timeToLive -= dt;
+		std::ostringstream stream;
+		stream << "Respawning in: " << std::fixed << std::setprecision(1) << timeToLive;
+		gui->setGameMessage(stream);
+		gui->setGameMessageVisible(true);
+	}
 }

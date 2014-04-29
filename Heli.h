@@ -6,6 +6,7 @@
 #include "HeliChass.h"
 #include "HeliProp.h"
 #include "Ball.h"
+#include "GUI.h"
 
 #define maxXZSpeed 80.0
 #define maxYSpeed 50.0
@@ -77,9 +78,9 @@ public:
     btVector3 reflect(btVector3& a, btVector3& b);
     btVector3& convertToWorld(btVector3&);
     btVector3& convertToLocal(btVector3&);
-    void inBounds(int, Ogre::Real);
+    void inBounds(int, Ogre::Real, GUI*);
     void kill();
-    void respawn(Ogre::Vector3, Ogre::Real);
+    void respawn(Ogre::Vector3, Ogre::Real, GUI*);
     bool alive;
 };
 

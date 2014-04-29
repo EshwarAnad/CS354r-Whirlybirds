@@ -77,9 +77,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		}
 
         //check if helicopter is in bounds
-        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
+        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame, gui);
         if(!game->heli->alive)
-            game->heli->respawn(game->getSpawnPos(), evt.timeSinceLastFrame);
+            game->heli->respawn(game->getSpawnPos(), evt.timeSinceLastFrame, gui);
 		xMove = 0.0,
 		yMove = 0.0,
 		zMove = 0.0;

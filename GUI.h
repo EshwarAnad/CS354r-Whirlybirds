@@ -16,6 +16,9 @@ class GUI
 		CEGUI::Window *clientBTN;
 		CEGUI::Window *serverBTN;
 		CEGUI::Editbox *serverPortBox;
+
+		CEGUI::Window *gameMessage;
+
 		char* serverIP;
 		int serverPort;
 
@@ -34,6 +37,9 @@ class GUI
 		char* CEGUIStringToString(CEGUI::String cestr); 
 		void setSinglePlayerScore(int score);
 		void setMultiplayerScores(int player1, int player2);
+		void setGameMessage(std::ostringstream&);
+		void setGameMessageVisible(bool);
+		
 };
 
 #endif
