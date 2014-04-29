@@ -66,16 +66,18 @@ void HeliProp::updateTransform() {
 }
 
 void HeliProp::update(){
-   /* static Ogre::String compName = "";
+    static Ogre::String compName = "";
     if(callback->ctxt.theObject != NULL){
         Ogre::String& objName = callback->ctxt.theObject->name;
         if (callback->ctxt.hit) {  
         //std::cout << "Prop hit: " << objName << std::endl;
             if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
-    			parent->setPowerup(objName);
-    			sMgr->destroyEntity(objName);
-    			sMgr->destroySceneNode(objName);
-    			simulator->removeObject(callback->ctxt.theObject);
+				if (sMgr->hasSceneNode(objName)) {
+    				parent->setPowerup(objName);
+    				sMgr->destroyEntity(objName);
+    				sMgr->destroySceneNode(objName);
+    				simulator->removeObject(callback->ctxt.theObject);
+				}
             }   else if(objName != parent->getChassName()){
                 hit(callback->ctxt, 1, compName == objName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
@@ -84,7 +86,7 @@ void HeliProp::update(){
         }
         else if(objName != compName)
             compName = "";
-    } */
+    }
 }
 
 void HeliProp::hit(CollisionContext& ctxt, int damage, bool same){

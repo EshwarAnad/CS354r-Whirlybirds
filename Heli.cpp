@@ -279,6 +279,7 @@ void Heli::expirePowerup() {
 	}
 	shield = false;
 	hasPowerup = false;
+	sim->soundSystem->playPowerDown(0);
 }
 
 void Heli::hit(CollisionContext& ctxt, int damage, bool same){
