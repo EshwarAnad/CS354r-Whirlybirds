@@ -10,6 +10,7 @@ class HeliProp : public GameObject {
 protected:
     void updateNode(Ogre::String);
     Heli* parent;
+	Ogre::SceneManager* sMgr;
 
 public:
     HeliProp(
@@ -26,8 +27,9 @@ public:
         );
     virtual void updateTransform();
     virtual void update();
-    void hit();
+    void hit(CollisionContext&, int, bool);
     void spin(Ogre::Real);
+    void setVisible(bool);
 };
 
 #endif

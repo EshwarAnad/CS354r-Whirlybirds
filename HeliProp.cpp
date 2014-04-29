@@ -15,6 +15,7 @@ HeliProp::HeliProp(
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
+	sMgr = mgr;
     parent = p;
     if (mgr) {
         geom = mgr->createEntity(nym+"propgeom", "heliprop.mesh");
@@ -65,21 +66,31 @@ void HeliProp::updateTransform() {
 }
 
 void HeliProp::update(){
-    if (this->callback->ctxt.hit) {
-        Ogre::String& objName = this->callback->ctxt.theObject->name;
-        //hit();
-
-        /*if (objName == "mytarget") {
-            simulator->soundPlayed = BALLTARGET;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playTargetHit();
+   /* static Ogre::String compName = "";
+    if(callback->ctxt.theObject != NULL){
+        Ogre::String& objName = callback->ctxt.theObject->name;
+        if (callback->ctxt.hit) {  
+        //std::cout << "Prop hit: " << objName << std::endl;
+            if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
+    			parent->setPowerup(objName);
+    			sMgr->destroyEntity(objName);
+    			sMgr->destroySceneNode(objName);
+    			simulator->removeObject(callback->ctxt.theObject);
+            }   else if(objName != parent->getChassName()){
+                hit(callback->ctxt, 1, compName == objName);
+                if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
+                compName = objName;
             }
-            Target* target = static_cast<Target*>(callback->ctxt.theObject);
-            target->movePlacement();
-        }*/
-    }
+        }
+        else if(objName != compName)
+            compName = "";
+    } */
 }
 
-void HeliProp::hit(){
-    parent->hit();
+void HeliProp::hit(CollisionContext& ctxt, int damage, bool same){
+    parent->hit(ctxt, damage, same);
+}
+
+void HeliProp::setVisible(bool b){
+    rootNode->setVisible(b);
 }

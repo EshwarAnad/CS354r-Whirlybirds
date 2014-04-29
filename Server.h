@@ -18,7 +18,7 @@
 class ClientToServer;
 class ServerToClient;
 
-#define NUM_PLAYERS 10
+#define NUM_PLAYERS 100
 
 class Server {
 protected:
@@ -30,8 +30,9 @@ public:
     int numConnected;
     Server(int serverPort);
     ~Server();
-    void awaitConnections();
+    int awaitConnections();
     void sendMsg(ServerToClient& data);
     bool recMsg(ClientToServer& data, int index);
+    void removeConnection(int index);
 };
 

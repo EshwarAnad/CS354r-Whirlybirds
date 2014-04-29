@@ -66,7 +66,7 @@ bool Client::recMsg(ServerToClient& data){
     bool success = ent->recMsg(reinterpret_cast<char*>(&data));
     
     if (success && !ent->hasInitSending) {
-        ent->initSending(serverIPAddr, 32100 + data.clientIndex - 1);
+        ent->initSending(serverIPAddr, 32100 + data.meta.clientIndex - 1);
     }
 
     return success;

@@ -24,7 +24,7 @@ Simulator::Simulator(){
 
     // Initialize the sound system
     soundSystem = new SoundSystem();
-    soundOn = true;
+    soundOn = false;
 }
 
 Simulator::~Simulator() {
@@ -60,15 +60,28 @@ void Simulator::stepSimulation(const Ogre::Real elapsedTime, int maxSubSteps, co
 
     for (int i = 0; i < objList.size(); i++) {
         objList[i]->callback->ctxt.hit = false;
+    }
 
+    for (int i = 0; i < objList.size(); i++) {
         for (int j = 0; j < objList.size(); j++) {
-            if (i == j) { continue; }
+            if (i != j) { 
+                bool flag = false;
 
-            dynamicsWorld->contactPairTest(
-                objList[i]->getBody(), 
-                objList[j]->getBody(), 
-                *(objList[i]->callback)
-                );
+                for (int k = 0; k < objList[i]->skipCollisions.size(); k++) {
+                    if (objList[i]->skipCollisions[k] == objList[j]) {
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if (flag) { continue; }
+
+                dynamicsWorld->contactPairTest(
+                    objList[i]->getBody(), 
+                    objList[j]->getBody(), 
+                    *(objList[i]->callback)
+                    );
+            }
         }
     }
 

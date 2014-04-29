@@ -6,11 +6,12 @@
 #include "HeliChass.h"
 #include "HeliProp.h"
 #include "Rocket.h"
+#include "Ball.h"
 
-#define maxXZSpeed 180.0
-#define maxYSpeed 90.0
+#define maxXZSpeed 80.0
+#define maxYSpeed 50.0
 #define maxYawSpeed 30.0
-#define speedIncrement 1.0
+#define speedIncrement 0.05
 #define speedBase 0.002
 #define maxTilt 25.0
 #define levelSpeed 0.02
@@ -18,9 +19,6 @@
 
 class Heli {
 protected:
-    HeliChass* chass;
-    HeliProp* prop;
-    //Rocket* rocket;
     Ogre::SceneNode* rootNode;
     bool fullMove;
 	Ogre::Real xTilt;
@@ -34,8 +32,16 @@ protected:
 	float speedModifier;
 	float powerModifier;
 	bool shield;
+	Ogre::SceneManager* sMgr;
+    Simulator* sim;
+	Ball* hShield;
+    bool outOfBounds;
+    float timeToDie;  //how long until death
+    float timeToLive; //how long until respawn
 
 public:
+    HeliChass* chass;
+    HeliProp* prop;
     Heli(
         Ogre::String nym, 
         Ogre::SceneManager* mgr, 
@@ -47,7 +53,9 @@ public:
         Ogre::Real friction,
         Ogre::String
         );
-    //Rocket* rocket;
+    ~Heli();
+
+    void DestroyAllAttachedMovableObjects(Ogre::SceneNode*);
     void addToSimulator();
     void setKinematic();
     void move(Ogre::Real, Ogre::Real, Ogre::Real);
@@ -56,16 +64,24 @@ public:
     void updateTransform();
     void setPropRot(Ogre::Real, Ogre::Real, Ogre::Real, Ogre::Real);
 	void rotate(Ogre::Real);
-    void hit();
+    void hit(CollisionContext&, int, bool);
     Ogre::SceneNode& getNode();
     GameObject* getProp();
     Ogre::Real getY();
+    Ogre::String getPropName();
+    Ogre::String getChassName();
 	void setPowerup(Ogre::String);
 	void expirePowerup();
-    void fire();
 	time_t powerupTime;
 	time_t currentTime;
 	bool hasPowerup;
+    btVector3 reflect(btVector3& a, btVector3& b);
+    btVector3& convertToWorld(btVector3&);
+    btVector3& convertToLocal(btVector3&);
+    void inBounds(int, Ogre::Real);
+    void kill();
+    void respawn(Ogre::Vector3, Ogre::Real);
+    bool alive;
 };
 
 #endif

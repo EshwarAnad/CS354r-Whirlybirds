@@ -11,7 +11,6 @@ protected:
     void updateNode(Ogre::String);
     Heli* parent;
 	Ogre::SceneManager* sMgr;
-    
 public:
     HeliChass(
         Ogre::String nym, 
@@ -27,7 +26,8 @@ public:
         );
     virtual void updateTransform();
     virtual void update();
-    void hit();
+    void hit(CollisionContext&, int, bool);
+    void setVisible(bool);
 };
 
 #endif

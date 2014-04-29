@@ -37,6 +37,7 @@ public:
     void addToSimulator();
     void updateTransform();
     Ogre::SceneNode& getNode();
+    int getBounds();
 };
 
 #endif

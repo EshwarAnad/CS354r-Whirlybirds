@@ -43,8 +43,9 @@ void Whirlybirds::createScene(void)
 	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
 
+bool powerupSpawn = false;
+
 bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
-    
     static Ogre::Real z_time = 0.0;
 	float xMove, yMove, zMove;
 
@@ -61,6 +62,24 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
     CEGUI::System::getSingleton().injectTimePulse(evt.timeSinceLastFrame);
 
 	if (gameplay) {
+		//check if powerup needs to spawn
+		if (mSceneMgr->hasSceneNode("speed") || mSceneMgr->hasSceneNode("power") || mSceneMgr->hasSceneNode("health") || mSceneMgr->hasSceneNode("shield")) {
+			time(&powerupTime);
+			powerupSpawn = true;
+		}
+
+		if (powerupSpawn) {
+			time(&currentTime);
+			if (difftime(currentTime, powerupTime) >= 20) {
+				game->spawnPowerup();
+				powerupSpawn = false;
+			}
+		}
+
+        //check if helicopter is in bounds
+        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
+        if(!game->heli->alive)
+            game->heli->respawn(game->getSpawnPos(), evt.timeSinceLastFrame);
 		xMove = 0.0,
 		yMove = 0.0,
 		zMove = 0.0;
@@ -92,40 +111,62 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 
 		game->heli->move(xMove, yMove, zMove);
 
-	 
-        Ogre::Real mMove = mMouse->getMouseState().X.rel;
-        game->heli->rotate(-mMove*0.035);
-        game->heli->updateTransform();
         
+//>>>>>>> 684cf499ce96f57988e506596fb6cb7beb70d9dd
+        Ogre::Real mMove = mMouse->getMouseState().X.rel;
+        
+        if (!isClient) {
+            game->heli->move(xMove, yMove, zMove);
+            game->heli->rotate(-mMove*0.035);
+            game->heli->updateTransform();
+	    }
+
+        game->rotateHeliProps(evt.timeSinceLastFrame);
+ 
         // get a packet from the server, then set the ball's position
         if (isClient) {
             // get state of the game from the server
             ServerToClient servData;
             if (client->recMsg(servData)) {
                 game->setDataFromServer(servData);
+                if (servData.meta.shutdown) {
+                    mShutDown = true;
+                }
             }
                 
-            // send the position of our helicopter to the server
-            client->sendMsg(game->getClientToServerData());
+            // send the user input for our helicopter to the server
+            ClientToServer cdata;
+            cdata.xMove = xMove;
+            cdata.yMove = yMove;
+            cdata.zMove = zMove;
+            cdata.mMove = mMove;
+            client->sendMsg(cdata);
         } else {
-			game->heli->animate(evt.timeSinceLastFrame);
-                
             // step the simulator
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
 
             if (!isSinglePlayer) {
-                server->awaitConnections();
-                
+                int newClientIndex = server->awaitConnections();
+               
+                if (newClientIndex != -1) {
+                    assert(newClientIndex != 0 && "we can't add the server player as a new player!");
+                    game->makeNewHeli(newClientIndex);
+                }
+ 
                 if (server->numConnected > 0) {    
                     // send the state of the game to the client
                     server->sendMsg(game->getServerToClientData());
                     simulator->soundPlayed = NOSOUND;
                 
-                    // get the state of the clients' helicopters
+                    // get clients' user input
                     for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
                             game->setDataFromClient(cdata, i+1);
+                            if (cdata.disconnecting) {
+                                server->removeConnection(i);
+                                printf("deleted connected to client #%d\n", i);
+                            }
                         }
                     }
                 }
@@ -145,11 +186,23 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 		if (arg.key == OIS::KC_X) {
 			simulator->soundOn = !(simulator->soundOn);
 		} else if (arg.key == OIS::KC_C) {
-			simulator->soundSystem->playMusic();
+			//simulator->soundSystem->playMusic();
 		}
 	}
 	if (arg.key == OIS::KC_ESCAPE)
     {
+        if (!isSinglePlayer) {
+            if (isClient) {
+                ClientToServer data;
+                data.disconnecting = true;
+                client->sendMsg(data);
+            } else {            
+                ServerToClient data;
+                data.meta.shutdown = true;
+                server->sendMsg(data);
+            }
+        }
+
         mShutDown = true;
     }
 
@@ -158,7 +211,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
         Ogre::Matrix3 ax = game->heli[0].getNode().getLocalAxes();
         char name[100];
         sprintf(name, "rocket%d", int(game->rockets.size()));
-        game->rockets.push_back(new Rocket(name, game->mgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+        game->rockets.push_back(new Rocket(name, game->mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
         game->rockets[game->rockets.size()-1]->addToSimulator();
         game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -80, -100));
     }
@@ -253,7 +306,9 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
         }
 
         printf("@#$ client starting up...\n");
-	}
+	} else {
+        printf("ERROR: client couldn't find server!\n");
+    }
     
 	return true;
 }

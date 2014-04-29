@@ -41,6 +41,7 @@ HeliChass::HeliChass(
     //need to figure this out
     shape = new btBoxShape(btVector3(scale*7.789/2, scale*4.353/2, scale*12.058/2));
     mass = m;
+    
 }
 
 void HeliChass::updateNode(Ogre::String n){
@@ -62,42 +63,31 @@ void HeliChass::updateTransform() {
 }
 
 void HeliChass::update(){
-    if (callback->ctxt.hit) {
-        Ogre::String& objName = callback->ctxt.theObject->name;
-		if (objName == "speed") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if (objName == "power") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if (objName == "health") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		} else if (objName == "shield") {
-			parent->setPowerup(objName);
-			sMgr->destroyEntity(objName);
-			simulator->removeObject(callback->ctxt.theObject);
-		}
-        if(objName != "heliProp"){
-            if (DEBUG) { std::cout << "Hit: " << objName << std::endl; }
-            hit();
-        }
-    else
-        std::cout << std::endl;
-        /*if (objName == "mytarget") {
-            simulator->soundPlayed = BALLTARGET;
-            if (simulator->soundOn) {
-                simulator->soundSystem->playTargetHit();
+    static Ogre::String compName = "";
+    if(callback->ctxt.theObject != NULL){
+            Ogre::String& objName = callback->ctxt.theObject->name;
+        if (callback->ctxt.hit) {
+            Ogre::String& objName = callback->ctxt.theObject->name;
+    		if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
+    			parent->setPowerup(objName);
+    			sMgr->destroyEntity(objName);
+    			sMgr->destroySceneNode(objName);
+    			simulator->removeObject(callback->ctxt.theObject);
+		    } else if(objName != parent->getPropName()) {
+                hit(callback->ctxt, 1, objName == compName);
+                if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
+                compName = objName;
             }
-            Target* target = static_cast<Target*>(callback->ctxt.theObject);
-            target->movePlacement();
-        }*/
+        }
+        else if(objName == compName)
+                compName = "";
     }
 }
 
-void HeliChass::hit(){
-    parent->hit();
+void HeliChass::hit(CollisionContext& ctxt, int damage, bool same){
+    parent->hit(ctxt, damage, same);
+}
+
+void HeliChass::setVisible(bool b){
+    rootNode->setVisible(b);
 }
