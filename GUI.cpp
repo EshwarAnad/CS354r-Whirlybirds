@@ -24,6 +24,12 @@ GUI::GUI(CEGUI::Event::Subscriber* spSub, CEGUI::Event::Subscriber* clientSub, C
 	spBTN = wmgr.createWindow("TaharezLook/Button", "Menu/SingleButton");
 	clientBTN = wmgr.createWindow("TaharezLook/Button", "Menu/ClientButton");
 	serverBTN = wmgr.createWindow("TaharezLook/Button", "Menu/SeverButton");
+	
+	//bounds message
+	gameMessage = wmgr.createWindow("TaharezLook/Button", "Message/gameMessage");
+	gameMessage->setVisible(false);
+	gameMessage->setSize(CEGUI::UVector2(CEGUI::UDim(0.5, 0), CEGUI::UDim(0.05, 0)));
+	gameMessage->setPosition(CEGUI::UVector2(CEGUI::UDim(0.25,0), CEGUI::UDim(0.25, 0)));
 
 	// set buttons sizes and locations
 	spBTN->setText("SINGLE PLAYER");
@@ -40,6 +46,7 @@ GUI::GUI(CEGUI::Event::Subscriber* spSub, CEGUI::Event::Subscriber* clientSub, C
 	p2score->setText("PLAYER 2");
 	p2score->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
 	p2score->setPosition(CEGUI::UVector2(CEGUI::UDim(0.85,0), CEGUI::UDim(0, 0)));	
+
 
     // find the hostname of this machine
     char hostname[1024];
@@ -69,6 +76,10 @@ GUI::GUI(CEGUI::Event::Subscriber* spSub, CEGUI::Event::Subscriber* clientSub, C
 	menuSheet->addChildWindow(p2score);
 	menuSheet->addChildWindow(serverIPBox);
 	menuSheet->addChildWindow(serverPortBox);
+
+	//add gameMessage to sheet
+	menuSheet->addChildWindow(gameMessage);
+
     CEGUI::System::getSingleton().setGUISheet(menuSheet);
 }
 
@@ -139,4 +150,12 @@ void GUI::setMultiplayerScores(int player1, int player2) {
 	stream.str("");
 	stream << "client score: " << player2;
 	p2score->setText(stream.str());
+}
+
+void GUI::setGameMessage(std::ostringstream& stream){
+	gameMessage->setText(stream.str());
+}
+
+void GUI::setGameMessageVisible(bool vis){
+	gameMessage->setVisible(vis);
 }
