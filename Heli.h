@@ -5,6 +5,7 @@
 #include <Ogre.h>
 #include "HeliChass.h"
 #include "HeliProp.h"
+#include "Rocket.h"
 #include "Ball.h"
 #include "GUI.h"
 

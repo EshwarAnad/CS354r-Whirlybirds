@@ -79,6 +79,7 @@ Heli::~Heli() {
 void Heli::addToSimulator() {
     chass->addToSimulator();
     prop->addToSimulator();
+    //rocket->addToSimulator();
 }
 
 void Heli::setKinematic(){
@@ -239,6 +240,7 @@ void Heli::setPropRot(Ogre::Real x, Ogre::Real y, Ogre::Real z, Ogre::Real w){
 void Heli::updateTransform(){
     chass->updateTransform();
     prop->updateTransform();
+    //rocket->updateTransform();
 }
 
 void Heli::setPowerup(Ogre::String pwr) {
