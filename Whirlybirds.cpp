@@ -28,6 +28,7 @@ Whirlybirds::~Whirlybirds(void)
 //-------------------------------------------------------------------------------------
 void Whirlybirds::createScene(void)
 {
+    simulator = new Simulator();
 	CEGUI::Event::Subscriber* spSub = new CEGUI::Event::Subscriber(&Whirlybirds::singlePlayer, this);
 	CEGUI::Event::Subscriber* clientSub = new CEGUI::Event::Subscriber(&Whirlybirds::clientStart, this);
 	CEGUI::Event::Subscriber* serverSub = new CEGUI::Event::Subscriber(&Whirlybirds::serverStart, this);
@@ -173,7 +174,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 
 	if (simulator) {
 		if (arg.key == OIS::KC_X) {
-			simulator->soundOn = !(simulator->soundOn);
+			simulator->soundSystem->mute();
 		} else if (arg.key == OIS::KC_C) {
 			//simulator->soundSystem->playMusic();
 		}
@@ -248,7 +249,10 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
     isClient = false;
     isSinglePlayer = true;
 
-    simulator = new Simulator();
+	simulator->soundSystem->playMusic();
+	simulator->soundSystem->playRotor();
+
+    //simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
     attachCamera();
 
@@ -262,12 +266,14 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 	isClient = true;
     isSinglePlayer = false;
 	
+	simulator->soundSystem->playMusic();
+
     int sPort = gui->getPort();
 	char* sip = gui->getIP();
     client = new Client(sip, sPort);
 
 	if (client->serverFound) {
-		simulator = new Simulator();
+		//simulator = new Simulator();
         game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
 
 		gui->destroyMenu(false);
@@ -292,11 +298,13 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 {
 	isClient = false;
     isSinglePlayer = false;
+
+	simulator->soundSystem->playMusic();
 	
     int sPort = gui->getPort();
     server = new Server(sPort);
 	
-    simulator = new Simulator();
+    //simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
     attachCamera();
  

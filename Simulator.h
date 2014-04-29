@@ -23,7 +23,6 @@ class Simulator {
 		std::vector<GameObject*> objList;
         float gravity;
         SoundSystem* soundSystem;
-        bool soundOn;
         int soundPlayed;	    
 		
         Simulator();
