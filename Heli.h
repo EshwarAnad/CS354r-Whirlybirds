@@ -5,6 +5,7 @@
 #include <Ogre.h>
 #include "HeliChass.h"
 #include "HeliProp.h"
+#include "Rocket.h"
 
 #define maxXZSpeed 180.0
 #define maxYSpeed 90.0
@@ -19,6 +20,7 @@ class Heli {
 protected:
     HeliChass* chass;
     HeliProp* prop;
+    //Rocket* rocket;
     Ogre::SceneNode* rootNode;
     bool fullMove;
 	Ogre::Real xTilt;
@@ -45,6 +47,7 @@ public:
         Ogre::Real friction,
         Ogre::String
         );
+    //Rocket* rocket;
     void addToSimulator();
     void setKinematic();
     void move(Ogre::Real, Ogre::Real, Ogre::Real);
@@ -59,6 +62,7 @@ public:
     Ogre::Real getY();
 	void setPowerup(Ogre::String);
 	void expirePowerup();
+    void fire();
 	time_t powerupTime;
 	time_t currentTime;
 	bool hasPowerup;

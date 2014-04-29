@@ -81,10 +81,18 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT))
 			yMove = evt.timeSinceLastFrame;
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
-			yMove = -evt.timeSinceLastFrame;
+            yMove = -evt.timeSinceLastFrame;        
+
+
+        for (int i = 0; i < game->rockets.size(); i++)
+        {
+            //game->rockets[i]->move();
+            game->rockets[i]->updateTransform(evt.timeSinceLastFrame);
+        }
 
 		game->heli->move(xMove, yMove, zMove);
-        
+
+	 
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
         game->heli->rotate(-mMove*0.035);
         game->heli->updateTransform();
@@ -144,6 +152,19 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
     {
         mShutDown = true;
     }
+
+    if (mKeyboard->isKeyDown(OIS::KC_E)){
+        Ogre::Vector3 pos = game->heli[0].getNode().getPosition();
+        Ogre::Matrix3 ax = game->heli[0].getNode().getLocalAxes();
+        char name[100];
+        sprintf(name, "rocket%d", int(game->rockets.size()));
+        game->rockets.push_back(new Rocket(name, game->mgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+        game->rockets[game->rockets.size()-1]->addToSimulator();
+        game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -80, -100));
+    }
+
+
+
 	return true;
 }
 
@@ -190,7 +211,8 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 void Whirlybirds::attachCamera(void) {
 	(&(game->heli->getNode()))->createChildSceneNode("camNode");
 	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
-	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+	//mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+    mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 60.0);
 }
 
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)

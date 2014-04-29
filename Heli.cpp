@@ -19,6 +19,8 @@ Heli::Heli(
     chass = new HeliChass(nym, mgr, sim, scale, m, org, restitution, friction, this, tex);
     Ogre::Vector3 off(0.0 * scale, 5.0 * scale, 2.5 * scale);
     prop = new HeliProp(nym, mgr, sim, scale, m, off, restitution, friction, this, tex);
+    Ogre::Vector3 rock(0.0 * scale, 10.0 * scale, 0 * scale);
+    //rocket = new Rocket(nym, mgr, sim, scale, m, rock, restitution, friction, this, tex);
 	xTilt = 0.0;
 	zTilt = 0.0;
 	xSpeed = 0.0;
@@ -37,6 +39,7 @@ Heli::Heli(
 void Heli::addToSimulator() {
     chass->addToSimulator();
     prop->addToSimulator();
+    //rocket->addToSimulator();
 }
 
 void Heli::setKinematic(){
@@ -196,6 +199,7 @@ void Heli::setPropRot(Ogre::Real x, Ogre::Real y, Ogre::Real z, Ogre::Real w){
 void Heli::updateTransform(){
     chass->updateTransform();
     prop->updateTransform();
+    //rocket->updateTransform();
 }
 
 void Heli::hit(){
@@ -228,4 +232,11 @@ void Heli::expirePowerup() {
 	powerModifier = 1.0;
 	shield = false;
 	hasPowerup = false;
+}
+
+void Heli::fire() {
+	//rocket = new Rocket(nym, mgr, sim, scale, m, rock, restitution, friction, this, tex);
+	//rocket->fired = 1;
+	//rocket->addToSimulator();
+	//rocket->setKinematic();
 }

@@ -9,13 +9,16 @@ protected:
     ServerToClient sdata_out;
     ClientToServer cdata_out;
 	Simulator* sim;
-	Ogre::SceneManager* mgr;
+	
 
 public:
 	Heli* helis[NUM_PLAYERS];
     Heli* heli; // our helicopter
     Level* level;
 	Ball* powerup;
+    std::vector<Rocket*> rockets;
+    Rocket* rocket;
+    Ogre::SceneManager* mgr;
     
     Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, bool isSinglePlayer);
     ~Game();
