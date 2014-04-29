@@ -346,17 +346,20 @@ void Heli::inBounds(int bound, Ogre::Real dt, GUI* gui){
 		//out of bounds
 		outOfBounds = true;
 		timeToDie -= dt;
-		std::ostringstream stream;
-		stream << "Return to battle or be destroyed! Time left: " << std::fixed <<  std::setprecision(1) << timeToDie;
-		gui->setGameMessage(stream);
-		gui->setGameMessageVisible(true);
+		if(gui != NULL){
+			std::ostringstream stream;
+			stream << "Return to battle or be destroyed! Time left: " << std::fixed <<  std::setprecision(1) << timeToDie;
+			gui->setGameMessage(stream);
+			gui->setGameMessageVisible(true);
+		}
 
 		if(timeToDie <= 0)
 			kill();
 	}
 
 	else if(alive && outOfBounds){
-		gui->setGameMessageVisible(false);
+		if(gui != NULL)
+			gui->setGameMessageVisible(false);
 		//in bounds
 		outOfBounds = false;
 		timeToDie = 10.0;
@@ -376,7 +379,8 @@ void Heli::kill(){
 
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 	if(timeToLive <= 0){
-		gui->setGameMessageVisible(false);
+		if(gui != NULL)
+			gui->setGameMessageVisible(false);
 		alive = true;
 		health = 100;
 		chass->setVisible(true);
@@ -385,9 +389,11 @@ void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 	}
 	else{
 		timeToLive -= dt;
-		std::ostringstream stream;
-		stream << "Respawning in: " << std::fixed << std::setprecision(1) << timeToLive;
-		gui->setGameMessage(stream);
-		gui->setGameMessageVisible(true);
+		if(gui != NULL){
+			std::ostringstream stream;
+			stream << "Respawning in: " << std::fixed << std::setprecision(1) << timeToLive;
+			gui->setGameMessage(stream);
+			gui->setGameMessageVisible(true);
+		}
 	}
 }

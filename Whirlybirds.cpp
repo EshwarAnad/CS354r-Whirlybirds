@@ -134,7 +134,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                 }
             }
                 
-            // send the user input for our helicopter to the server
+            // send the user input and state for our helicopter to the server
             ClientToServer cdata;
             cdata.xMove = xMove;
             cdata.yMove = yMove;
@@ -158,11 +158,16 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                     server->sendMsg(game->getServerToClientData());
                     simulator->soundPlayed = NOSOUND;
                 
-                    // get clients' user input
+                    // get clients' user input and update state
                     for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
                             game->setDataFromClient(cdata, i+1);
+                            if(game->helis[i+1] != NULL){
+                                game->helis[i+1]->inBounds(game->level->getBounds(), evt.timeSinceLastFrame, NULL);
+                                if(!game->helis[i+1]->alive)
+                                    game->helis[i+1]->respawn(game->getSpawnPos(), evt.timeSinceLastFrame, NULL);
+                            }
                             if (cdata.disconnecting) {
                                 server->removeConnection(i);
                                 printf("deleted connected to client #%d\n", i);
