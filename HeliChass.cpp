@@ -70,7 +70,6 @@ void HeliChass::update(){
             Ogre::String& objName = callback->ctxt.theObject->name;
     		if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
 				if (sMgr->hasSceneNode(objName)) {
-					simulator->soundSystem->playPowerUp(1);
     				parent->setPowerup(objName);
     				sMgr->destroyEntity(objName);
     				sMgr->destroySceneNode(objName);
