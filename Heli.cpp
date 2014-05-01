@@ -250,12 +250,15 @@ void Heli::setPowerup(Ogre::String pwr) {
 		expirePowerup();
 		hasPowerup = true;
 		speedModifier = 2.0;
+		sim->soundSystem->playPowerUp(0);
 	} else if (pwr == "power") {
 		expirePowerup();
 		hasPowerup = true;
 		powerModifier = 2.0;
+		sim->soundSystem->playPowerUp(1);
 	} else if (pwr == "health") {
 		health = (health + 50 > 100) ? 100 : health + 50;
+		sim->soundSystem->playPowerUp(2);
 	} else {
 		expirePowerup();
 		hasPowerup = true;
@@ -266,20 +269,25 @@ void Heli::setPowerup(Ogre::String pwr) {
 		hShield->setKinematic();
     	hShield->skipCollisions.push_back(prop);
 		shield = true;
+		sim->soundSystem->playPowerUp(3);
 	}
 }
 
 void Heli::expirePowerup() {
-	speedModifier = 1.0;
-	powerModifier = 1.0;
-	if (shield) {
+	if (speedModifier != 1.0) {
+		speedModifier = 1.0;
+		sim->soundSystem->playPowerDown(0);
+	} else if (powerModifier != 1.0) {
+		powerModifier = 1.0;
+		sim->soundSystem->playPowerDown(1);
+	} else if (shield) {
 		sMgr->destroyEntity(name+"hShield");
 		sMgr->destroySceneNode(name+"hShield");
 		sim->removeObject(hShield);
-	}
-	shield = false;
+		shield = false;
+		sim->soundSystem->playPowerDown(3);
+	} 
 	hasPowerup = false;
-	sim->soundSystem->playPowerDown(0);
 }
 
 void Heli::hit(CollisionContext& ctxt, int damage, bool same){

@@ -22,10 +22,10 @@ SoundSystem::SoundSystem()
 	speedUp = Mix_LoadWAV("media/sound/speedUp.wav");
 	speedDown = Mix_LoadWAV("media/sound/speedDown.wav");
 	powerUp = Mix_LoadWAV("media/sound/powerUp.wav");
-	powerDown = Mix_LoadWAV("media/sound/speedDown.wav");
+	powerDown = Mix_LoadWAV("media/sound/powerDown.wav");
 	healthUp = Mix_LoadWAV("media/sound/healthUp.wav");
 	shieldUp = Mix_LoadWAV("media/sound/shieldUp.wav");
-	shieldDown = Mix_LoadWAV("media/sound/speedDown.wav");
+	shieldDown = Mix_LoadWAV("media/sound/shieldDown.wav");
 }
 
 /* mute and unmute all sounds */
@@ -78,16 +78,16 @@ void SoundSystem::playPowerUp(int p)
 
 void SoundSystem::playPowerDown(int p)
 {
-	if (!isMuted && Mix_Playing(2) == 0) {
+	if (!isMuted && Mix_Playing(3) == 0) {
 		switch (p) {
 			case 0:
-				Mix_PlayChannel(2, speedDown, 0);
+				Mix_PlayChannel(3, speedDown, 0);
 				break;
 			case 1:
-				Mix_PlayChannel(2, powerDown, 0);
+				Mix_PlayChannel(3, powerDown, 0);
 				break;
 			case 3:
-				Mix_PlayChannel(2, shieldDown, 0);
+				Mix_PlayChannel(3, shieldDown, 0);
 				break;
 		}
 	}
