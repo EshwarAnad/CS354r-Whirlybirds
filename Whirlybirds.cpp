@@ -34,7 +34,7 @@ void Whirlybirds::createScene(void)
 	gui = new GUI(spSub, clientSub, serverSub);
 	   
 	// Set the scene's ambient light
-    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
 
     // Create a Light and set its position
     Ogre::Light* light = mSceneMgr->createLight("MainLight");

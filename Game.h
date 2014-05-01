@@ -48,7 +48,7 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
     Ogre::Vector3 origin(0, 0, 0);
    
     // level 
-    level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "");
+    level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "Examples/Rockwall");
 	
     // powerup
 	spawnPowerup();
@@ -90,6 +90,25 @@ void Game::makeNewHeli(int index) {
         helis[index]->addToSimulator();
         helis[index]->setKinematic();
     }
+
+    char lightName[100];
+    sprintf(lightName, "heli%dlight", index);
+
+    Ogre::Light* spotLight = mSceneMgr->createLight(lightName);
+    spotLight->setType(Ogre::Light::LT_SPOTLIGHT);
+   
+    spotLight->setDiffuseColour(0.5, 0.5, 0.5);
+    spotLight->setSpecularColour(0.5, 0.5, .5); 
+    spotLight->setDirection(0,0,-1);
+    spotLight->setSpotlightRange(Ogre::Degree(35), Ogre::Degree(50));	
+   
+    char nodeName[100];
+    sprintf(nodeName, "heli%dlightnode", index);
+ 
+    (&(helis[index]->getNode()))->createChildSceneNode(nodeName);
+	mSceneMgr->getSceneNode(nodeName)->attachObject(spotLight);
+	mSceneMgr->getSceneNode(nodeName)->translate(0.0, 0.0, 0.0);
+    
     
     printf("added %s at %d\n", name, index, pos);
 }

@@ -28,8 +28,10 @@ Wall::Wall(Ogre::String rootNym,
         rootNode->attachObject(geom);
         rootNode->setPosition(x, y, z);
 
-        if(tex != "")
+        if(tex != "") {
             geom->setMaterialName(tex);
+        }
+
         geom->setCastShadows(false);
     }
 
