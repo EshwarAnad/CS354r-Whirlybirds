@@ -23,7 +23,7 @@ Rocket::Rocket(
         geom->setCastShadows(false);
         updateNode(nym+"chassgeom");
         rootNode->attachObject(geom);
-
+        //rootNode->showBoundingBox(true);
         // sphere starts at 100 units radius
         rootNode->scale(
             scale,
@@ -38,7 +38,7 @@ Rocket::Rocket(
     }
 
     //need to figure this out
-    shape = new btBoxShape(btVector3(scale/2, scale/2, scale/2));
+    shape = new btBoxShape(btVector3(scale/2, scale*2, scale/2));
     mass = m;
     fired = 0;
 }
