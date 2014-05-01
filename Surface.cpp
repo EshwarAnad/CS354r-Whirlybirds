@@ -31,7 +31,7 @@ Surface::Surface(Ogre::String nym,
 
 void Surface::update() {
     if (callback->ctxt.hit) {
-        if (simulator->soundOn) {
+        if (!simulator->soundSystem->isMuted) {
             if (isPaddle(name) && isBall(callback->ctxt.theObject->name)) {
                 //simulator->soundSystem->playRaquetHit();
             }

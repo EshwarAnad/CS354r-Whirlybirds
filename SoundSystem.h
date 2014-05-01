@@ -12,21 +12,24 @@
 class SoundSystem
 {
 protected:
-    Mix_Music *music;
-    Mix_Chunk *wallHit;
-    Mix_Chunk *raquetHit;
-    Mix_Chunk *targetHit;
-	Mix_Chunk *p2Hit;
-    int flags;
+    Mix_Music *menuMusic;
+	Mix_Chunk *rotor;
+	Mix_Chunk *speedUp;
+	Mix_Chunk *speedDown;
+	Mix_Chunk *powerUp;
+	Mix_Chunk *powerDown;
+	Mix_Chunk *healthUp;
+	Mix_Chunk *shieldUp;
+	Mix_Chunk *shieldDown;
 
 public:
+	bool isMuted;
     SoundSystem(void);
+	void mute(void);
     void playMusic(void);
-    void resetFlags(void);
-    void playWallHit(int);
-    void playRaquetHit(void);
-    void playTargetHit(void);
-	void playP2Hit(void);
+	void playRotor(void);
+	void playPowerUp(int);
+	void playPowerDown(int);
 };
 
 #endif //#ifndef __SoundSystem_h_

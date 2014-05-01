@@ -28,6 +28,7 @@ Whirlybirds::~Whirlybirds(void)
 //-------------------------------------------------------------------------------------
 void Whirlybirds::createScene(void)
 {
+    simulator = new Simulator();
 	CEGUI::Event::Subscriber* spSub = new CEGUI::Event::Subscriber(&Whirlybirds::singlePlayer, this);
 	CEGUI::Event::Subscriber* clientSub = new CEGUI::Event::Subscriber(&Whirlybirds::clientStart, this);
 	CEGUI::Event::Subscriber* serverSub = new CEGUI::Event::Subscriber(&Whirlybirds::serverStart, this);
@@ -77,9 +78,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		}
 
         //check if helicopter is in bounds
-        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame);
+        game->heli->inBounds(game->level->getBounds(), evt.timeSinceLastFrame, gui);
         if(!game->heli->alive)
-            game->heli->respawn(game->getSpawnPos(), evt.timeSinceLastFrame);
+            game->heli->respawn(game->getSpawnPos(), evt.timeSinceLastFrame, gui);
 		xMove = 0.0,
 		yMove = 0.0,
 		zMove = 0.0;
@@ -100,8 +101,19 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT))
 			yMove = evt.timeSinceLastFrame;
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
-			yMove = -evt.timeSinceLastFrame;
+            yMove = -evt.timeSinceLastFrame;        
+
+
+        for (int i = 0; i < game->rockets.size(); i++)
+        {
+            //game->rockets[i]->move();
+            game->rockets[i]->updateTransform(evt.timeSinceLastFrame);
+        }
+
+		game->heli->move(xMove, yMove, zMove);
+
         
+//>>>>>>> 684cf499ce96f57988e506596fb6cb7beb70d9dd
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
         
         if (!isClient) {
@@ -123,7 +135,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                 }
             }
                 
-            // send the user input for our helicopter to the server
+            // send the user input and state for our helicopter to the server
             ClientToServer cdata;
             cdata.xMove = xMove;
             cdata.yMove = yMove;
@@ -147,11 +159,16 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                     server->sendMsg(game->getServerToClientData());
                     simulator->soundPlayed = NOSOUND;
                 
-                    // get clients' user input
+                    // get clients' user input and update state
                     for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
                             game->setDataFromClient(cdata, i+1);
+                            if(game->helis[i+1] != NULL){
+                                game->helis[i+1]->inBounds(game->level->getBounds(), evt.timeSinceLastFrame, NULL);
+                                if(!game->helis[i+1]->alive)
+                                    game->helis[i+1]->respawn(game->getSpawnPos(), evt.timeSinceLastFrame, NULL);
+                            }
                             if (cdata.disconnecting) {
                                 server->removeConnection(i);
                                 printf("deleted connected to client #%d\n", i);
@@ -173,7 +190,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 
 	if (simulator) {
 		if (arg.key == OIS::KC_X) {
-			simulator->soundOn = !(simulator->soundOn);
+			simulator->soundSystem->mute();
 		} else if (arg.key == OIS::KC_C) {
 			//simulator->soundSystem->playMusic();
 		}
@@ -194,6 +211,19 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 
         mShutDown = true;
     }
+
+    if (mKeyboard->isKeyDown(OIS::KC_E)){
+        Ogre::Vector3 pos = game->heli[0].getNode().getPosition();
+        Ogre::Matrix3 ax = game->heli[0].getNode().getLocalAxes();
+        char name[100];
+        sprintf(name, "rocket%d", int(game->rockets.size()));
+        game->rockets.push_back(new Rocket(name, game->mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+        game->rockets[game->rockets.size()-1]->addToSimulator();
+        game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -80, -100));
+    }
+
+
+
 	return true;
 }
 
@@ -240,7 +270,8 @@ bool Whirlybirds::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID i
 void Whirlybirds::attachCamera(void) {
 	(&(game->heli->getNode()))->createChildSceneNode("camNode");
 	mSceneMgr->getSceneNode("camNode")->attachObject(mCamera);
-	mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+	//mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 30.0);
+    mSceneMgr->getSceneNode("camNode")->translate(0.0, 35.0, 60.0);
 }
 
 bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
@@ -248,7 +279,10 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
     isClient = false;
     isSinglePlayer = true;
 
-    simulator = new Simulator();
+	simulator->soundSystem->playMusic();
+	simulator->soundSystem->playRotor();
+
+    //simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
     attachCamera();
 
@@ -262,12 +296,14 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
 	isClient = true;
     isSinglePlayer = false;
 	
+	simulator->soundSystem->playMusic();
+
     int sPort = gui->getPort();
 	char* sip = gui->getIP();
     client = new Client(sip, sPort);
 
 	if (client->serverFound) {
-		simulator = new Simulator();
+		//simulator = new Simulator();
         game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
 
 		gui->destroyMenu(false);
@@ -292,11 +328,13 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
 {
 	isClient = false;
     isSinglePlayer = false;
+
+	simulator->soundSystem->playMusic();
 	
     int sPort = gui->getPort();
     server = new Server(sPort);
 	
-    simulator = new Simulator();
+    //simulator = new Simulator();
     game = new Game(simulator, mSceneMgr, isClient, isSinglePlayer);
     attachCamera();
  

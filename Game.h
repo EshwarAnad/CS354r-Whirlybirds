@@ -19,6 +19,9 @@ public:
     Heli* heli; // our helicopter
     Level* level;
 	Ball* powerup;
+    std::vector<Rocket*> rockets;
+    Rocket* rocket;
+    //Ogre::SceneManager* mgr;
     Simulator* simulator;
     Ogre::SceneManager* mSceneMgr;
     
