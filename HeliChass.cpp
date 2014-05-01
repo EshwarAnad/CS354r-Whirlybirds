@@ -76,6 +76,8 @@ void HeliChass::update(){
     				simulator->removeObject(callback->ctxt.theObject);
 				}
 		    } else if(objName != parent->getPropName()) {
+				if (Ogre::StringUtil::startsWith(objName, "cube", true) || objName == "base")
+					simulator->soundSystem->playWallHit();
                 hit(callback->ctxt, 1, objName == compName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;

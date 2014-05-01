@@ -224,6 +224,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
         game->rockets[game->rockets.size()-1]->addToSimulator();
         game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
         //game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
+		simulator->soundSystem->playShootRocket();
     }
 
 

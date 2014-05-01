@@ -26,6 +26,8 @@ SoundSystem::SoundSystem()
 	healthUp = Mix_LoadWAV("media/sound/healthUp.wav");
 	shieldUp = Mix_LoadWAV("media/sound/shieldUp.wav");
 	shieldDown = Mix_LoadWAV("media/sound/shieldDown.wav");
+	shootRocket = Mix_LoadWAV("media/sound/rocket.wav");
+	wallHit = Mix_LoadWAV("media/sound/wallHit.wav");
 }
 
 /* mute and unmute all sounds */
@@ -91,4 +93,20 @@ void SoundSystem::playPowerDown(int p)
 				break;
 		}
 	}
+}
+
+void SoundSystem::playShootRocket()
+{
+	if (!isMuted) {
+		if (Mix_Playing(4) == 0)
+			Mix_PlayChannel(4, shootRocket, 0);
+		else if (Mix_Playing(5) == 0)
+			Mix_PlayChannel(5, shootRocket, 0);
+	}
+}
+
+void SoundSystem::playWallHit()
+{
+	if (!isMuted && Mix_Playing(6) == 0)
+		Mix_PlayChannel(6, wallHit, 0);
 }
