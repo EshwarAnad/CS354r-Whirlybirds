@@ -21,9 +21,6 @@ public:
         Ogre::Vector3 pos, 
         Ogre::Matrix3 ax,
         float vel,
-        //Ogre::Real restitution, 
-        //Ogre::Real friction,
-	   //Heli* p,
         Ogre::String
         );
 
@@ -31,8 +28,7 @@ public:
     float velocity;
     bool fired;
     virtual void updateTransform(Ogre::Real delta);
-    void move();//(Ogre::Real x, Ogre::Real y, Ogre::Real z);
-    //void addToSimulator();
+    void move();
     void explode();
 };
 
