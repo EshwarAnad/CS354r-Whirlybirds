@@ -10,9 +10,6 @@ Rocket::Rocket(
     Ogre::Vector3 pos,
     Ogre::Matrix3 ax,
     float vel,
-    //Ogre::Real restitution, 
-    //Ogre::Real friction,
-    //Heli* p,
     Ogre::String tex = ""
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)

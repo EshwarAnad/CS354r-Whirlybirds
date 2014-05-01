@@ -35,7 +35,7 @@ void Whirlybirds::createScene(void)
 	gui = new GUI(spSub, clientSub, serverSub);
 	   
 	// Set the scene's ambient light
-    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
+    mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f, 0.1f, 0.1f));
 
     // Create a Light and set its position
     Ogre::Light* light = mSceneMgr->createLight("MainLight");
@@ -113,7 +113,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		game->heli->move(xMove, yMove, zMove);
 
         
-//>>>>>>> 684cf499ce96f57988e506596fb6cb7beb70d9dd
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
         
         if (!isClient) {
@@ -218,8 +217,13 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
         char name[100];
         sprintf(name, "rocket%d", int(game->rockets.size()));
         game->rockets.push_back(new Rocket(name, game->mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+        Ogre::Quaternion angle = game->heli->getNode().getOrientation(); //FINISH
+        //game->rockets[game->rockets.size()-1]->getNode().setOrientation(angle);
+
+        Ogre::Vector3 pTemp(angle* Ogre::Vector3::NEGATIVE_UNIT_Z * 500);
         game->rockets[game->rockets.size()-1]->addToSimulator();
-        game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -80, -100));
+        game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
+        //game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
     }
 
 

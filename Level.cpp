@@ -33,7 +33,7 @@ Level::Level(
 		bDim = getData(data);
 		bRot = getData(data);
 		debug(name, bPos, bDim, bRot);
-		building[i] = new Building(nym, name, mgr, sim, scale, bPos, bDim, bRot, restitution, friction, "");
+		building[i] = new Building(nym, name, mgr, sim, scale, bPos, bDim, bRot, restitution, friction, tex);
 	}
 	data.close();
 
