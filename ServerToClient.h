@@ -14,12 +14,6 @@ struct HeliInfo {
     Ogre::Quaternion orient;
     bool exists;
     int index;
-
-    HeliInfo() {
-        for (int i = 0; i < MAX_MISSILES_PER_PLAYER; i++) {
-            missiles[i].exists = false;
-        }
-    }
 };
 
 struct MetaData {

@@ -5,10 +5,12 @@
 struct ClientToServer {
     bool disconnecting;
     float xMove, yMove, zMove, mMove;
+    bool firingRocket;
 
     ClientToServer() {
         xMove = yMove = zMove = mMove = 0;
         disconnecting = false;
+        firingRocket = false;
     }
 };
 

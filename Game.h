@@ -163,6 +163,10 @@ void Game::setDataFromClient(ClientToServer& data, int i) {
         helis[i]->move(data.xMove, data.yMove, data.zMove);
         helis[i]->rotate(-data.mMove*0.035);
         helis[i]->updateTransform();
+        
+        if (data.firingRocket) {
+            printf("client rocket fired!\n");
+        }
     }
 }
 
