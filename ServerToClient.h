@@ -25,7 +25,6 @@ struct MetaData {
 
 struct ServerToClient {
     MetaData meta;
-    MissileInfo missiles[MAX_MISSILES];
     HeliInfo heliPoses[NUM_PLAYERS];
 
     ServerToClient() {
