@@ -293,8 +293,9 @@ void Heli::expirePowerup() {
 void Heli::hit(CollisionContext& ctxt, int damage, bool same){
 	if(!same){
 		std::cout << "Taking damage o noes" << std::endl;
+		health -= 10;
 	}
-	if(health <= 0)
+	if(alive && health <= 0)
 		kill();
 	Ogre::Vector3 temp = rootNode->getPosition();
 	btVector3 spdV(xSpeed, ySpeed, zSpeed);
@@ -362,7 +363,7 @@ void Heli::inBounds(int bound, Ogre::Real dt, GUI* gui){
 			gui->setGameMessageVisible(true);
 		}
 
-		if(timeToDie <= 0)
+		if(alive && timeToDie <= 0)
 			kill();
 	}
 
@@ -376,7 +377,9 @@ void Heli::inBounds(int bound, Ogre::Real dt, GUI* gui){
 	}
 }
 
-void Heli::kill(){
+void Heli::kill() {
+	sim->soundSystem->playHeliExplode();	
+	expirePowerup();
 	alive = false;
 	timeToDie = 10.0;
 	timeToLive = 5.0;
@@ -384,6 +387,7 @@ void Heli::kill(){
 	prop->setVisible(false);
 	//put it in purgatory!
 	rootNode->setPosition(0, -1000, 0);
+	sim->soundSystem->playTaps();
 }
 
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
@@ -395,6 +399,7 @@ void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 		chass->setVisible(true);
 		prop->setVisible(true);
 		rootNode->setPosition(pos);
+		sim->soundSystem->playTaps();
 	}
 	else{
 		timeToLive -= dt;

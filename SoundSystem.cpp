@@ -28,6 +28,11 @@ SoundSystem::SoundSystem()
 	shieldDown = Mix_LoadWAV("media/sound/shieldDown.wav");
 	shootRocket = Mix_LoadWAV("media/sound/rocket.wav");
 	wallHit = Mix_LoadWAV("media/sound/wallHit.wav");
+	heliExplode = Mix_LoadWAV("media/sound/heliExplode.wav");
+	Mix_VolumeChunk(heliExplode, 128);
+	rocketExplode = Mix_LoadWAV("media/sound/rocketExplode.wav");
+	taps = Mix_LoadWAV("media/sound/taps.wav");
+	Mix_VolumeChunk(taps, 50);
 }
 
 /* mute and unmute all sounds */
@@ -109,4 +114,34 @@ void SoundSystem::playWallHit()
 {
 	if (!isMuted && Mix_Playing(6) == 0)
 		Mix_PlayChannel(6, wallHit, 0);
+}
+
+void SoundSystem::playHeliExplode()
+{
+	if (!isMuted && Mix_Playing(7) == 0)
+		Mix_PlayChannel(7, heliExplode, 0);
+}
+
+void SoundSystem::playRocketExplode()
+{
+	if (!isMuted) {
+		if (Mix_Playing(8) == 0)
+			Mix_PlayChannel(8, rocketExplode, 0);
+		else if (Mix_Playing(9) == 0)
+			Mix_PlayChannel(9, rocketExplode, 0);
+	}
+}
+
+void SoundSystem::playTaps()
+{
+	std::cout << "TAPS!";
+	if (!isMuted) {
+		if (Mix_Playing(10) == 0) {
+			Mix_PlayChannel(10, taps, 0);
+			playRotor();
+		} else {
+			Mix_HaltChannel(10);
+			playRotor();
+		}
+	}
 }

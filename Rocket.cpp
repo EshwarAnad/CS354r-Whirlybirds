@@ -80,3 +80,17 @@ void Rocket::updateTransform(Ogre::Real delta) {
 
 
 }
+
+void Rocket::update() {
+	if (callback->ctxt.theObject != NULL) {
+		Ogre::String& objName = callback->ctxt.theObject->name;
+		if (callback->ctxt.hit) {
+			if (Ogre::StringUtil::startsWith(objName, "heli", true)) {
+				simulator->soundSystem->playRocketExplode();
+				//callback->ctxt.theObject->hit();
+			} else if (Ogre::StringUtil::startsWith(objName, "cube", true) || objName == "base") {
+				simulator->soundSystem->playRocketExplode();
+			}
+		}
+	}
+}

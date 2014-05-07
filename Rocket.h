@@ -28,6 +28,7 @@ public:
     float velocity;
     bool fired;
     virtual void updateTransform(Ogre::Real delta);
+	virtual void update();
     void move();
     void explode();
 };
