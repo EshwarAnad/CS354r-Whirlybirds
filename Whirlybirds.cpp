@@ -210,7 +210,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
         mShutDown = true;
     }
 
-    if (mKeyboard->isKeyDown(OIS::KC_E)){
+    if (gameplay && mKeyboard->isKeyDown(OIS::KC_E)){
         Ogre::Vector3 pos = game->heli[0].getNode().getPosition();
         pos = pos + Ogre::Vector3(0, 20, 0);
         Ogre::Matrix3 ax = game->heli[0].getNode().getLocalAxes();

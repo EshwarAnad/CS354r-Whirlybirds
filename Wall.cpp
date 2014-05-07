@@ -45,14 +45,10 @@ Wall::Wall(Ogre::String rootNym,
         shape = NULL;
 }
 
-void Wall::update() {
-    if (callback->ctxt.hit) {
-        if (!simulator->soundSystem->isMuted) {
-            if (isBall(callback->ctxt.theObject->name)) {
-                //simulator->soundSystem->playWallHit();
-            }
-        }
-    }
+void Wall::update()
+{
+	if (callback->ctxt.hit) {
+	}
 }
 
 void Wall::updateNode(Ogre::String n){

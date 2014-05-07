@@ -32,7 +32,7 @@ GUI::GUI(CEGUI::Event::Subscriber* spSub, CEGUI::Event::Subscriber* clientSub, C
 	gameMessage->setPosition(CEGUI::UVector2(CEGUI::UDim(0.25,0), CEGUI::UDim(0.25, 0)));
 
 	// set buttons sizes and locations
-	spBTN->setText("SINGLE PLAYER");
+	spBTN->setText("TUTORIAL");
 	spBTN->setSize(CEGUI::UVector2(CEGUI::UDim(0.18, 0), CEGUI::UDim(0.05, 0)));
 	spBTN->setPosition(CEGUI::UVector2(CEGUI::UDim(0.4,0), CEGUI::UDim(0.3, 0)));
 	clientBTN->setText("CLIENT");

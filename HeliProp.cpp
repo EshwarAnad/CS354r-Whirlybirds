@@ -79,7 +79,7 @@ void HeliProp::update(){
     				simulator->removeObject(callback->ctxt.theObject);
 				}
             }   else if(objName != parent->getChassName()){
-                hit(callback->ctxt, 1, compName == objName);
+                hit(callback->ctxt, 10, compName == objName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;
             }
