@@ -10,9 +10,6 @@ Rocket::Rocket(
     Ogre::Vector3 pos,
     Ogre::Matrix3 ax,
     float vel,
-    //Ogre::Real restitution, 
-    //Ogre::Real friction,
-    //Heli* p,
     Ogre::String tex = ""
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
@@ -26,7 +23,7 @@ Rocket::Rocket(
         geom->setCastShadows(false);
         updateNode(nym+"chassgeom");
         rootNode->attachObject(geom);
-
+        //rootNode->showBoundingBox(true);
         // sphere starts at 100 units radius
         rootNode->scale(
             scale,
@@ -41,7 +38,7 @@ Rocket::Rocket(
     }
 
     //need to figure this out
-    shape = new btBoxShape(btVector3(scale/2, scale/2, scale/2));
+    shape = new btBoxShape(btVector3(scale/2, scale*2, scale/2));
     mass = m;
     fired = 0;
 }
@@ -82,4 +79,18 @@ void Rocket::updateTransform(Ogre::Real delta) {
     }
 
 
+}
+
+void Rocket::update() {
+	if (callback->ctxt.theObject != NULL) {
+		Ogre::String& objName = callback->ctxt.theObject->name;
+		if (callback->ctxt.hit) {
+			if (Ogre::StringUtil::startsWith(objName, "heli", true)) {
+				simulator->soundSystem->playRocketExplode();
+				//callback->ctxt.theObject->hit();
+			} else if (Ogre::StringUtil::startsWith(objName, "cube", true) || objName == "base") {
+				simulator->soundSystem->playRocketExplode();
+			}
+		}
+	}
 }

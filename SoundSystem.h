@@ -21,6 +21,11 @@ protected:
 	Mix_Chunk *healthUp;
 	Mix_Chunk *shieldUp;
 	Mix_Chunk *shieldDown;
+	Mix_Chunk *shootRocket;
+	Mix_Chunk *wallHit;
+	Mix_Chunk *heliExplode;
+	Mix_Chunk *rocketExplode;
+	Mix_Chunk *taps;
 
 public:
 	bool isMuted;
@@ -30,6 +35,11 @@ public:
 	void playRotor(void);
 	void playPowerUp(int);
 	void playPowerDown(int);
+	void playShootRocket(void);
+	void playWallHit(void);
+	void playHeliExplode(void);
+	void playRocketExplode(void);
+	void playTaps(void);
 };
 
 #endif //#ifndef __SoundSystem_h_

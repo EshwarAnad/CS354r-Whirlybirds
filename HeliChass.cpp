@@ -70,13 +70,14 @@ void HeliChass::update(){
             Ogre::String& objName = callback->ctxt.theObject->name;
     		if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
 				if (sMgr->hasSceneNode(objName)) {
-					simulator->soundSystem->playPowerUp(1);
     				parent->setPowerup(objName);
     				sMgr->destroyEntity(objName);
     				sMgr->destroySceneNode(objName);
     				simulator->removeObject(callback->ctxt.theObject);
 				}
 		    } else if(objName != parent->getPropName()) {
+				if (Ogre::StringUtil::startsWith(objName, "cube", true) || Ogre::StringUtil::startsWith(objName, "heli", true) || objName == "base")
+					simulator->soundSystem->playWallHit();
                 hit(callback->ctxt, 1, objName == compName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;

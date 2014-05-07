@@ -250,12 +250,15 @@ void Heli::setPowerup(Ogre::String pwr) {
 		expirePowerup();
 		hasPowerup = true;
 		speedModifier = 2.0;
+		sim->soundSystem->playPowerUp(0);
 	} else if (pwr == "power") {
 		expirePowerup();
 		hasPowerup = true;
 		powerModifier = 2.0;
+		sim->soundSystem->playPowerUp(1);
 	} else if (pwr == "health") {
 		health = (health + 50 > 100) ? 100 : health + 50;
+		sim->soundSystem->playPowerUp(2);
 	} else {
 		expirePowerup();
 		hasPowerup = true;
@@ -266,27 +269,33 @@ void Heli::setPowerup(Ogre::String pwr) {
 		hShield->setKinematic();
     	hShield->skipCollisions.push_back(prop);
 		shield = true;
+		sim->soundSystem->playPowerUp(3);
 	}
 }
 
 void Heli::expirePowerup() {
-	speedModifier = 1.0;
-	powerModifier = 1.0;
-	if (shield) {
+	if (speedModifier != 1.0) {
+		speedModifier = 1.0;
+		sim->soundSystem->playPowerDown(0);
+	} else if (powerModifier != 1.0) {
+		powerModifier = 1.0;
+		sim->soundSystem->playPowerDown(1);
+	} else if (shield) {
 		sMgr->destroyEntity(name+"hShield");
 		sMgr->destroySceneNode(name+"hShield");
 		sim->removeObject(hShield);
-	}
-	shield = false;
+		shield = false;
+		sim->soundSystem->playPowerDown(3);
+	} 
 	hasPowerup = false;
-	sim->soundSystem->playPowerDown(0);
 }
 
 void Heli::hit(CollisionContext& ctxt, int damage, bool same){
 	if(!same){
 		std::cout << "Taking damage o noes" << std::endl;
+		health -= 10;
 	}
-	if(health <= 0)
+	if(alive && health <= 0)
 		kill();
 	Ogre::Vector3 temp = rootNode->getPosition();
 	btVector3 spdV(xSpeed, ySpeed, zSpeed);
@@ -354,7 +363,7 @@ void Heli::inBounds(int bound, Ogre::Real dt, GUI* gui){
 			gui->setGameMessageVisible(true);
 		}
 
-		if(timeToDie <= 0)
+		if(alive && timeToDie <= 0)
 			kill();
 	}
 
@@ -368,7 +377,9 @@ void Heli::inBounds(int bound, Ogre::Real dt, GUI* gui){
 	}
 }
 
-void Heli::kill(){
+void Heli::kill() {
+	sim->soundSystem->playHeliExplode();	
+	expirePowerup();
 	alive = false;
 	timeToDie = 10.0;
 	timeToLive = 5.0;
@@ -376,6 +387,7 @@ void Heli::kill(){
 	prop->setVisible(false);
 	//put it in purgatory!
 	rootNode->setPosition(0, -1000, 0);
+	sim->soundSystem->playTaps();
 }
 
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
@@ -387,6 +399,7 @@ void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 		chass->setVisible(true);
 		prop->setVisible(true);
 		rootNode->setPosition(pos);
+		sim->soundSystem->playTaps();
 	}
 	else{
 		timeToLive -= dt;
