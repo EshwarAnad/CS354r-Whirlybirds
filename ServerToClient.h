@@ -3,17 +3,23 @@
 #include <btBulletDynamicsCommon.h>
 #include "Server.h"
 
+struct MissileInfo {
+    Ogre::Vector3 pos;
+    Ogre::Quaternion orient;
+    bool exists;
+};
+
 struct HeliInfo {
     Ogre::Vector3 pos;
     Ogre::Quaternion orient;
     bool exists;
     int index;
-};
 
-struct MissileInfo {
-    Ogre::Vector3 pos;
-    Ogre::Quaternion orient;
-    bool exists;
+    HeliInfo() {
+        for (int i = 0; i < MAX_MISSILES_PER_PLAYER; i++) {
+            missiles[i].exists = false;
+        }
+    }
 };
 
 struct MetaData {
@@ -25,8 +31,8 @@ struct MetaData {
 
 struct ServerToClient {
     MetaData meta;
+    MissileInfo missiles[MAX_MISSILES];
     HeliInfo heliPoses[NUM_PLAYERS];
-    MissileInfo missiels[NUM_MISSILES];
 
     ServerToClient() {
         meta.sound = 0;
@@ -36,10 +42,6 @@ struct ServerToClient {
 
         for (int i = 0; i < NUM_PLAYERS; i++) {
             heliPoses[i].exists = false;
-        }
-
-        for (int i = 0; i < NUM_MISSILES; i++) {
-            missiles[i].exists = false;
         }
     }
 };

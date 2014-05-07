@@ -211,6 +211,7 @@ ServerToClient& Game::getServerToClientData(void) {
             sdata_out.heliPoses[np].orient = helis[i]->getNode().getOrientation();
             sdata_out.heliPoses[np].index = i;
             sdata_out.heliPoses[np].exists = true;
+            
             np += 1;
         } 
     }
