@@ -10,6 +10,12 @@ struct HeliInfo {
     int index;
 };
 
+struct MissileInfo {
+    Ogre::Vector3 pos;
+    Ogre::Quaternion orient;
+    bool exists;
+};
+
 struct MetaData {
     bool shutdown;
     int clientIndex; // set by the server, specific to the client it sends to
@@ -20,6 +26,7 @@ struct MetaData {
 struct ServerToClient {
     MetaData meta;
     HeliInfo heliPoses[NUM_PLAYERS];
+    MissileInfo missiels[NUM_MISSILES];
 
     ServerToClient() {
         meta.sound = 0;
@@ -29,6 +36,10 @@ struct ServerToClient {
 
         for (int i = 0; i < NUM_PLAYERS; i++) {
             heliPoses[i].exists = false;
+        }
+
+        for (int i = 0; i < NUM_MISSILES; i++) {
+            missiles[i].exists = false;
         }
     }
 };
