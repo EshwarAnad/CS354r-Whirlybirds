@@ -3,6 +3,12 @@
 #include <btBulletDynamicsCommon.h>
 #include "Server.h"
 
+struct MissileInfo {
+    Ogre::Vector3 pos;
+    Ogre::Quaternion orient;
+    bool exists;
+};
+
 struct HeliInfo {
     Ogre::Vector3 pos;
     Ogre::Quaternion orient;

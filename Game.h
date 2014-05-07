@@ -35,6 +35,7 @@ public:
     void rotateHeliProps(Ogre::Real t);
 	void spawnPowerup(void);
     void makeNewHeli(int index);
+    void addRocket(Heli* heli);
     Ogre::Vector3 getSpawnPos();
 
     void display(void); // debugging
@@ -77,6 +78,22 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         makeNewHeli(0);
         heli = helis[0];
     }
+}
+
+void Game::addRocket(Heli* mheli) {
+    Ogre::Vector3 pos = mheli->getNode().getPosition();
+    pos = pos + Ogre::Vector3(0, 20, 0);
+    Ogre::Matrix3 ax = mheli->getNode().getLocalAxes();
+    
+    char name[100];
+    sprintf(name, "rocket%d", int(rockets.size()));
+    rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+    
+    Ogre::Quaternion angle = mheli->getNode().getOrientation();
+    Ogre::Vector3 pTemp(angle* Ogre::Vector3::NEGATIVE_UNIT_Z * 700);
+    rockets[rockets.size()-1]->addToSimulator();
+    rockets[rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
+    //rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
 }
 
 void Game::makeNewHeli(int index) {
@@ -163,6 +180,10 @@ void Game::setDataFromClient(ClientToServer& data, int i) {
         helis[i]->move(data.xMove, data.yMove, data.zMove);
         helis[i]->rotate(-data.mMove*0.035);
         helis[i]->updateTransform();
+        
+        if (data.firingRocket) {
+            addRocket(helis[i]);
+        }
     }
 }
 
@@ -211,6 +232,7 @@ ServerToClient& Game::getServerToClientData(void) {
             sdata_out.heliPoses[np].orient = helis[i]->getNode().getOrientation();
             sdata_out.heliPoses[np].index = i;
             sdata_out.heliPoses[np].exists = true;
+            
             np += 1;
         } 
     }

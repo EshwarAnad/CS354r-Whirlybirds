@@ -19,6 +19,7 @@ class ClientToServer;
 class ServerToClient;
 
 #define NUM_PLAYERS 100
+#define MAX_MISSILES 10
 
 class Server {
 protected:
