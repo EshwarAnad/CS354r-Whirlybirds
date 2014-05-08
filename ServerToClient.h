@@ -2,6 +2,7 @@
 
 #include <btBulletDynamicsCommon.h>
 #include "Server.h"
+#include "SoundSystem.h"
 
 struct RocketInfo {
     Ogre::Vector3 pos;
@@ -26,7 +27,7 @@ struct HeliInfo {
 struct MetaData {
     bool shutdown;
     int clientIndex; // set by the server, specific to the client it sends to
-    int sound;
+    SOUND sound;
     int numPlaying;
     long time;
     int numRockets;
@@ -38,7 +39,7 @@ struct ServerToClient {
     HeliInfo heliPoses[NUM_PLAYERS];
 
     ServerToClient() {
-        meta.sound = 0;
+        meta.sound = SOUND_NONE;
         meta.numPlaying = 0;
         meta.numRockets = 0;
         meta.clientIndex = -1;

@@ -116,6 +116,8 @@ void Game::addRocket(Heli* mheli) {
         rockets[rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
         //rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
     }
+                
+    simulator->soundSystem->playShootRocket();
 }
 
 void Game::makeNewHeli(int index) {
@@ -254,10 +256,20 @@ void Game::setDataFromServer(ServerToClient& data) {
         rockets[i]->getNode().setPosition(data.meta.rockets[i].pos);
         rockets[i]->getNode().setOrientation(data.meta.rockets[i].orient);
     }
+
+    if (data.meta.sound != 0) {
+        printf("playing sound %d\n", data.meta.sound);
+    }
+
+    simulator->soundSystem->playSound(data.meta.sound);
 }
 
 ServerToClient& Game::getServerToClientData(void) {
-    sdata_out.meta.sound = 0;
+    SOUND sound = simulator->soundSystem->getLastSoundPlayed();
+    if (sound != 0) {
+        printf("sending sound: %d\n", sound);
+    }
+    sdata_out.meta.sound = sound;
     sdata_out.meta.clientIndex = 0;
     sdata_out.meta.numPlaying = 0;
    
