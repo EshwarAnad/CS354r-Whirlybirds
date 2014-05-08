@@ -19,7 +19,7 @@ class ClientToServer;
 class ServerToClient;
 
 #define NUM_PLAYERS 100
-#define MAX_ROCKETS 10
+#define MAX_ROCKETS 5
 
 class Server {
 protected:

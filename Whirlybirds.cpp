@@ -112,27 +112,32 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             e_time += evt.timeSinceLastFrame;
         }   
 
-        for (int i = 0; i < game->rockets.size(); i++)
-        {
-            //game->rockets[i]->move();
-            game->rockets[i]->updateTransform(evt.timeSinceLastFrame);
-            game->rockets[i]->timeToExpire(evt.timeSinceLastFrame);
-            if(game->rockets[i]->destroy){
-                //std::cout << "Destroying rocket " << game->rockets[i]->name << " @ " << i << "..." << std::endl;
-                game->rockets[i]->Rocket::~Rocket();
-                //std::cout << "Destroyed." << std::endl;
-                game->rockets.erase(game->rockets.begin()+i);
-                //std::cout << "Removed from vector." << std::endl;
-                
+        if (!isClient || isSinglePlayer) {
+            for (int i = 0; i < game->rockets.size(); i++)
+            {
+                //game->rockets[i]->move();
+                game->rockets[i]->updateTransform(evt.timeSinceLastFrame);
+                game->rockets[i]->timeToExpire(evt.timeSinceLastFrame);
+                if(game->rockets[i]->destroy){
+                    //std::cout << "Destroying rocket " << game->rockets[i]->name << " @ " << i << "..." << std::endl;
+                    game->rockets[i]->Rocket::~Rocket();
+                    //std::cout << "Destroyed." << std::endl;
+                    game->rockets.erase(game->rockets.begin()+i);
+                    //std::cout << "Removed from vector." << std::endl;
+                    
+                }
             }
         }
+            
 
-		game->heli->move(xMove, yMove, zMove);
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
-		if (game->heliAI) {
-			game->heliAI->move(-xMove, yMove, zMove);
-			game->heliAI->rotate(-mMove*0.035);
-		}
+            
+        if (isSinglePlayer) {
+            if (game->heliAI) {
+                game->heliAI->move(-xMove, yMove, zMove);
+                game->heliAI->rotate(-mMove*0.035);
+            }
+        }
         
         if (!isClient) {
             game->heli->move(xMove, yMove, zMove);
