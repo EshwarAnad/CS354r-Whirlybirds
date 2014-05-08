@@ -13,6 +13,7 @@ protected:
     std::vector<Ogre::Vector3> positions;
     bool isClient;
     bool isSinglePlayer;
+    unsigned int rocketNum;
 
 public:
 	Heli* helis[NUM_PLAYERS];
@@ -50,6 +51,7 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
 	mgr = mSceneMgr;
     static Ogre::Real WORLDSCALE = 3.0;
     Ogre::Vector3 origin(0, 0, 0);
+    rocketNum = 0;
    
     // level 
     level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "Examples/Rockwall");
@@ -90,8 +92,9 @@ void Game::addRocket(Heli* mheli) {
         ax = mheli->getNode().getLocalAxes();
     }
     
-    char name[100];
-    sprintf(name, "rocket%d", int(rockets.size()));
+    char name[100] = {0};
+    sprintf(name, "rocket%d", rocketNum);
+    rocketNum++;
     rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
 
     if (mheli != NULL) { 

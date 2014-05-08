@@ -17,7 +17,14 @@ Rocket::Rocket(
     pos2 = pos;
     velocity = vel;
     if (mgr) {
-        geom = mgr->createEntity(nym+"chassgeom", "fish.mesh");
+        try{
+            geom = mgr->createEntity(nym+"chassgeom", "fish.mesh");
+        }
+        catch (std::exception& e) {
+            std::cout << "Already an entity of this name! Destroying..." << std::endl;
+            mgr->destroyEntity(nym+"chassgeom");
+            geom = mgr->createEntity(nym+"chassgeom", "fish.mesh");
+        }
         if(tex != "")
             geom->setMaterialName(tex);
         geom->setCastShadows(false);
@@ -41,6 +48,8 @@ Rocket::Rocket(
     shape = new btBoxShape(btVector3(scale/2, scale*2, scale/2));
     mass = m;
     fired = 0;
+    timeToLive = 5.0;
+    destroy = false;
 }
 
 //not used
@@ -60,7 +69,15 @@ void Rocket::explode(){
 }
 
 void Rocket::updateNode(Ogre::String n){
-    rootNode = rootNode->createChildSceneNode(n);
+    try{
+            rootNode = rootNode->createChildSceneNode(n);
+    }
+    catch (std::exception& e) {
+            std::cout << "Already a SceneNode of this name! Destroying..." << std::endl;
+            sceneMgr->destroySceneNode(n);
+            rootNode = rootNode->createChildSceneNode(n);
+    }
+    
     name = n;
 }
 
@@ -85,12 +102,31 @@ void Rocket::update() {
 	if (callback->ctxt.theObject != NULL) {
 		Ogre::String& objName = callback->ctxt.theObject->name;
 		if (callback->ctxt.hit) {
-			if (Ogre::StringUtil::startsWith(objName, "heli", true)) {
-				simulator->soundSystem->playRocketExplode();
-				//callback->ctxt.theObject->hit();
-			} else if (Ogre::StringUtil::startsWith(objName, "cube", true) || objName == "base") {
+			 if (Ogre::StringUtil::startsWith(objName, "cube", true) || objName == "base") {
 				simulator->soundSystem->playRocketExplode();
 			}
+            destroy = true;
 		}
 	}
+}
+
+void Rocket::timeToExpire(Ogre::Real dt){
+    if(timeToLive <= 0.0){
+        destroy = true;
+    }
+    timeToLive -= dt;
+}
+
+Rocket::~Rocket() {
+    rootNode->detachAllObjects();
+    //std::cout << "Destroying Entity." << std::endl;
+    sceneMgr->destroyEntity(name);
+    //std::cout << "Destroying SceneNode." << std::endl;
+    sceneMgr->destroySceneNode(rootNode);
+    //std::cout << "Removing from Simulator." << std::endl;
+    simulator->removeObject(this);
+    delete callback;
+    delete motionState;
+    delete body;
+    delete context;
 }

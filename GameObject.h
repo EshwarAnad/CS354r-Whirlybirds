@@ -23,6 +23,7 @@ class GameObject {
 		btVector3 inertia;
 		Ogre::Real restitution;
     	Ogre::Real friction;
+    	CollisionContext* context;
 
 	public:
         std::vector<GameObject*> skipCollisions;

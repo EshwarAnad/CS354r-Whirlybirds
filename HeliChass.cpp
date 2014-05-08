@@ -78,13 +78,17 @@ void HeliChass::update(){
 		    } else if(objName != parent->getPropName()) {
 				if (Ogre::StringUtil::startsWith(objName, "cube", true) || Ogre::StringUtil::startsWith(objName, "heli", true) || objName == "base")
 					simulator->soundSystem->playWallHit();
-                hit(callback->ctxt, 1, objName == compName);
+                hit(callback->ctxt, 10, objName == compName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;
-            }
+            } else if (Ogre::StringUtil::startsWith(objName, "rocket", true)) {
+				hit(callback->ctxt, 20, objName == compName);
+				simulator->soundSystem->playRocketExplode();
+			}
         }
-        else if(objName == compName)
-                compName = "";
+        else if(objName == compName){
+            compName = "";
+        }
     }
 }
 
