@@ -103,7 +103,11 @@ void Game::addRocket(Heli* mheli) {
     char name[100] = {0};
     sprintf(name, "rocket%d", rocketNum);
     rocketNum++;
-    rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+    Rocket* temp = new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket");
+    Ogre::ParticleSystem* part = mSceneMgr->createParticleSystem(name, "Examples/Smoke");
+    temp->getNode().attachObject(part);
+    rockets.push_back(temp);
+    //rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
 
     if (mheli != NULL) { 
         Ogre::Quaternion angle = mheli->getNode().getOrientation();
@@ -222,6 +226,8 @@ void Game::setDataFromServer(ServerToClient& data) {
         
         helis[index]->getNode().setPosition(data.heliPoses[i].pos);
         helis[index]->getNode().setOrientation(data.heliPoses[i].orient);
+        helis[index]->deaths = data.heliPoses[i].deaths;
+        //printf("player %d died %d times\n", i, helis[index]->deaths);
         updatedHelis[index] = true;
     }
    
@@ -269,7 +275,8 @@ ServerToClient& Game::getServerToClientData(void) {
             sdata_out.heliPoses[np].index = i;
             sdata_out.heliPoses[np].exists = true;
             sdata_out.heliPoses[np].isAlive = helis[i]->alive;
-            
+            sdata_out.heliPoses[np].deaths = helis[i]->deaths; 
+            //printf("player %d died %d times\n", i, helis[i]->deaths);
             np += 1;
         } 
     }

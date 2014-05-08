@@ -15,6 +15,13 @@ struct HeliInfo {
     bool exists;
     int index;
     bool isAlive;
+    unsigned char deaths;
+
+    HeliInfo() {
+        exists = false;
+        index = 0;
+        deaths = 0;
+    }
 };
 
 struct MetaData {
@@ -37,10 +44,6 @@ struct ServerToClient {
         meta.numRockets = 0;
         meta.clientIndex = -1;
         meta.shutdown = false;
-
-        for (int i = 0; i < NUM_PLAYERS; i++) {
-            heliPoses[i].exists = false;
-        }
     }
 };
 

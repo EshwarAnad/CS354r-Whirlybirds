@@ -103,6 +103,8 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
             yMove = -evt.timeSinceLastFrame;
         if (mKeyboard->isKeyDown(OIS::KC_E) && e_time == 0.0){
+
+
             if (gameplay && (!isClient || isSinglePlayer)) {
                 game->addRocket(game->heli);
                 simulator->soundSystem->playShootRocket();
@@ -129,7 +131,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             }
         }
             
-
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
             
         if (isSinglePlayer) {
@@ -314,6 +315,7 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
     isSinglePlayer = false;
 	
 	simulator->soundSystem->playMusic();
+	simulator->soundSystem->playRotor();
 
     int sPort = gui->getPort();
 	char* sip = gui->getIP();
@@ -347,6 +349,7 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
     isSinglePlayer = false;
 
 	simulator->soundSystem->playMusic();
+	simulator->soundSystem->playRotor();
 	
     int sPort = gui->getPort();
     server = new Server(sPort);

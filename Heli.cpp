@@ -30,7 +30,7 @@ Heli::Heli(
 	zSpeed = 0.0;
 	ySpeed = 0.0;
 	yawSpeed = 0.0;
-	speedModifier = 1.0;
+	speedModifier = 3.0;
 	powerModifier = 1.0;
 	shield = false;
 	name = nym;
@@ -41,7 +41,7 @@ Heli::Heli(
 	outOfBounds = false;
 	timeToDie = 10.0;
 	alive = true;
-	int deaths = 0;
+	deaths = 0;
 }
 
 void Heli::DestroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )

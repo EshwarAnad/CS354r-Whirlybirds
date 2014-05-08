@@ -10,7 +10,7 @@ class Rocket : public GameObject {
 protected:
     void updateNode(Ogre::String);
     Heli* parent;
-    
+
 public:
     Rocket(
         Ogre::String nym, 
@@ -25,6 +25,7 @@ public:
         );
     ~Rocket();
 
+    //Ogre::ParticleSystemManager pMan;
     Ogre::Vector3 pos2;
     float velocity;
     bool fired;
