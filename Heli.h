@@ -84,6 +84,10 @@ public:
     void kill();
     void respawn(Ogre::Vector3, Ogre::Real, GUI*);
     bool alive;
+
+    bool fire;
+
+    Ogre::ParticleSystem* part;
 };
 
 #endif
