@@ -103,7 +103,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
             yMove = -evt.timeSinceLastFrame;
         if (mKeyboard->isKeyDown(OIS::KC_E) && e_time == 0.0){
-            if (!isClient || isSinglePlayer) {
+            if (gameplay && (!isClient || isSinglePlayer)) {
                 game->addRocket(game->heli);
                 simulator->soundSystem->playShootRocket();
             } else {
