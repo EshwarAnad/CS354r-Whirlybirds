@@ -41,7 +41,7 @@ Heli::Heli(
 	outOfBounds = false;
 	timeToDie = 10.0;
 	alive = true;
-	int deaths = 0;
+	deaths = 0;
 }
 
 void Heli::DestroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
