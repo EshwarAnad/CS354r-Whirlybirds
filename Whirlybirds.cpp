@@ -310,6 +310,7 @@ bool Whirlybirds::clientStart(const CEGUI::EventArgs &e)
     isSinglePlayer = false;
 	
 	simulator->soundSystem->playMusic();
+	simulator->soundSystem->playRotor();
 
     int sPort = gui->getPort();
 	char* sip = gui->getIP();
@@ -343,6 +344,7 @@ bool Whirlybirds::serverStart(const CEGUI::EventArgs &e)
     isSinglePlayer = false;
 
 	simulator->soundSystem->playMusic();
+	simulator->soundSystem->playRotor();
 	
     int sPort = gui->getPort();
     server = new Server(sPort);
