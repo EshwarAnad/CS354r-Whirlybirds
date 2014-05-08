@@ -57,7 +57,7 @@ void GameObject::addToSimulator() {
         body = new btRigidBody(rbInfo);
         body->setUserPointer(this);
 
-        CollisionContext* context = new CollisionContext();
+        context = new CollisionContext();
         callback = new ContactSensorCallback(*body, *context);
         
         simulator->addObject(this);

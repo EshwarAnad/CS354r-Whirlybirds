@@ -51,6 +51,7 @@ protected:
     bool isSinglePlayer;
 	time_t powerupTime;
 	time_t currentTime;
+    unsigned int rocketNum;
 
 	// Game Objects
     Game* game;

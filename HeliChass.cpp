@@ -83,8 +83,9 @@ void HeliChass::update(){
                 compName = objName;
             }
         }
-        else if(objName == compName)
-                compName = "";
+        else if(objName == compName){
+            compName = "";
+        }
     }
 }
 
