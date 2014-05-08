@@ -86,8 +86,9 @@ void HeliChass::update(){
 				simulator->soundSystem->playRocketExplode();
 			}
         }
-        else if(objName == compName)
-                compName = "";
+        else if(objName == compName){
+            compName = "";
+        }
     }
 }
 

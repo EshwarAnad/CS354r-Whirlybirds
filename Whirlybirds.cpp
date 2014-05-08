@@ -47,7 +47,7 @@ void Whirlybirds::createScene(void)
 bool powerupSpawn = false;
 
 bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
-    static Ogre::Real z_time = 0.0;
+    static Ogre::Real e_time = 0.0;
 	float xMove, yMove, zMove;
 
     if(mWindow->isClosed())
@@ -85,10 +85,10 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		yMove = 0.0,
 		zMove = 0.0;
 
-        if(z_time > 0.0 && z_time < 1.0)
-            z_time += evt.timeSinceLastFrame;
+        if(e_time > 0.0 && e_time < 0.5)
+            e_time += evt.timeSinceLastFrame;
         else
-            z_time = 0.0;
+            e_time = 0.0;
         
         if(mKeyboard->isKeyDown(OIS::KC_W))
 			zMove = -evt.timeSinceLastFrame;
@@ -101,13 +101,30 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_LSHIFT))
 			yMove = evt.timeSinceLastFrame;
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
-            yMove = -evt.timeSinceLastFrame;        
-
+            yMove = -evt.timeSinceLastFrame;
+        if (mKeyboard->isKeyDown(OIS::KC_E) && e_time == 0.0){
+            if (!isClient || isSinglePlayer) {
+                game->addRocket(game->heli);
+                simulator->soundSystem->playShootRocket();
+            } else {
+                clientFiringRocket = true;
+            }
+            e_time += evt.timeSinceLastFrame;
+        }   
 
         for (int i = 0; i < game->rockets.size(); i++)
         {
             //game->rockets[i]->move();
             game->rockets[i]->updateTransform(evt.timeSinceLastFrame);
+            game->rockets[i]->timeToExpire(evt.timeSinceLastFrame);
+            if(game->rockets[i]->destroy){
+                //std::cout << "Destroying rocket " << game->rockets[i]->name << " @ " << i << "..." << std::endl;
+                game->rockets[i]->Rocket::~Rocket();
+                //std::cout << "Destroyed." << std::endl;
+                game->rockets.erase(game->rockets.begin()+i);
+                //std::cout << "Removed from vector." << std::endl;
+                
+            }
         }
 
 		game->heli->move(xMove, yMove, zMove);
@@ -214,18 +231,6 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 
         mShutDown = true;
     }
-
-    if (gameplay && mKeyboard->isKeyDown(OIS::KC_E)){
-        if (!isClient || isSinglePlayer) {
-            game->addRocket(game->heli);
-            simulator->soundSystem->playShootRocket();
-        } else {
-            clientFiringRocket = true;
-        }
-    }
-
-
-
 	return true;
 }
 

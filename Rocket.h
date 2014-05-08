@@ -23,14 +23,18 @@ public:
         float vel,
         Ogre::String
         );
+    ~Rocket();
 
     Ogre::Vector3 pos2;
     float velocity;
     bool fired;
+    bool destroy;
+    Ogre::Real timeToLive;
     virtual void updateTransform(Ogre::Real delta);
 	virtual void update();
     void move();
     void explode();
+    void timeToExpire(Ogre::Real);
 };
 
 #endif

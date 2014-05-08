@@ -68,24 +68,27 @@ void HeliProp::updateTransform() {
 void HeliProp::update(){
     static Ogre::String compName = "";
     if(callback->ctxt.theObject != NULL){
-        Ogre::String& objName = callback->ctxt.theObject->name;
-        if (callback->ctxt.hit) {  
-        //std::cout << "Prop hit: " << objName << std::endl;
+            Ogre::String& objName = callback->ctxt.theObject->name;
+        if (callback->ctxt.hit) {
+            Ogre::String& objName = callback->ctxt.theObject->name;
             if (objName == "speed" || objName == "power" || objName == "health" || objName == "shield") {
-				if (sMgr->hasSceneNode(objName)) {
-    				parent->setPowerup(objName);
-    				sMgr->destroyEntity(objName);
-    				sMgr->destroySceneNode(objName);
-    				simulator->removeObject(callback->ctxt.theObject);
-				}
-            }   else if(objName != parent->getChassName()){
-                hit(callback->ctxt, 10, compName == objName);
+                if (sMgr->hasSceneNode(objName)) {
+                    parent->setPowerup(objName);
+                    sMgr->destroyEntity(objName);
+                    sMgr->destroySceneNode(objName);
+                    simulator->removeObject(callback->ctxt.theObject);
+                }
+            } else if(objName != parent->getChassName()) {
+                if (Ogre::StringUtil::startsWith(objName, "cube", true) || Ogre::StringUtil::startsWith(objName, "heli", true) || objName == "base")
+                    simulator->soundSystem->playWallHit();
+                hit(callback->ctxt, 10, objName == compName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;
             }
         }
-        else if(objName != compName)
+        else if(objName == compName){
             compName = "";
+        }
     }
 }
 
