@@ -41,11 +41,6 @@ GUI::GUI(CEGUI::Event::Subscriber* spSub, CEGUI::Event::Subscriber* clientSub, C
 	serverBTN->setText("SERVER");
 	serverBTN->setSize(CEGUI::UVector2(CEGUI::UDim(0.18, 0), CEGUI::UDim(0.05, 0)));
 	serverBTN->setPosition(CEGUI::UVector2(CEGUI::UDim(0.4,0), CEGUI::UDim(0.5, 0)));
-    p1score->setText("PLAYER 1");
-    p1score->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
-	p2score->setText("PLAYER 2");
-	p2score->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
-	p2score->setPosition(CEGUI::UVector2(CEGUI::UDim(0.85,0), CEGUI::UDim(0, 0)));	
 
 
     // find the hostname of this machine
