@@ -128,8 +128,11 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
         }
 
 		game->heli->move(xMove, yMove, zMove);
-        
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
+		if (game->heliAI) {
+			game->heliAI->move(-xMove, yMove, zMove);
+			game->heliAI->rotate(-mMove*0.035);
+		}
         
         if (!isClient) {
             game->heli->move(xMove, yMove, zMove);
