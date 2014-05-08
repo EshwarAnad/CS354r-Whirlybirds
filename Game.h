@@ -220,7 +220,7 @@ void Game::setDataFromServer(ServerToClient& data) {
         
         helis[index]->getNode().setPosition(data.heliPoses[i].pos);
         helis[index]->getNode().setOrientation(data.heliPoses[i].orient);
-        helis[index].deaths = data.heliPoses[i].deaths;
+        helis[index]->deaths = data.heliPoses[i].deaths;
         updatedHelis[index] = true;
     }
    
@@ -264,7 +264,8 @@ ServerToClient& Game::getServerToClientData(void) {
             sdata_out.heliPoses[np].orient = helis[i]->getNode().getOrientation();
             sdata_out.heliPoses[np].index = i;
             sdata_out.heliPoses[np].exists = true;
-            sdata_out.heliPoses[np].deaths = helis[i].deaths; 
+            sdata_out.heliPoses[np].deaths = helis[i]->deaths; 
+            printf("player %d died %d times\n", i, helis[i]->deaths);
             np += 1;
         } 
     }
