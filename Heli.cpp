@@ -41,6 +41,7 @@ Heli::Heli(
 	outOfBounds = false;
 	timeToDie = 10.0;
 	alive = true;
+	int deaths = 0;
 }
 
 void Heli::DestroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
@@ -389,6 +390,7 @@ void Heli::kill() {
 	rootNode->setPosition(0, -1000, 0);
 	if (name != "heliAI")
 		sim->soundSystem->playTaps();
+	deaths++;
 }
 
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
