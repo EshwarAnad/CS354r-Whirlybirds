@@ -129,7 +129,6 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             }
         }
             
-
         Ogre::Real mMove = mMouse->getMouseState().X.rel;
             
         if (isSinglePlayer) {

@@ -9,8 +9,8 @@
 #include "Ball.h"
 #include "GUI.h"
 
-#define maxXZSpeed 80.0
-#define maxYSpeed 60.0
+#define maxXZSpeed 40.0
+#define maxYSpeed 30.0
 #define maxYawSpeed 20.0
 #define speedIncrement 0.05
 #define speedBase 0.002

@@ -30,7 +30,7 @@ Heli::Heli(
 	zSpeed = 0.0;
 	ySpeed = 0.0;
 	yawSpeed = 0.0;
-	speedModifier = 1.0;
+	speedModifier = 3.0;
 	powerModifier = 1.0;
 	shield = false;
 	name = nym;
