@@ -48,6 +48,7 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
 {
 	srand(time(NULL));
 
+    heliAI = NULL;
 	sim = simulator;
 	mgr = mSceneMgr;
     static Ogre::Real WORLDSCALE = 3.0;
@@ -149,7 +150,6 @@ void Game::makeNewHeli(int index) {
     (&(helis[index]->getNode()))->createChildSceneNode(nodeName);
 	mSceneMgr->getSceneNode(nodeName)->attachObject(spotLight);
 	mSceneMgr->getSceneNode(nodeName)->translate(0.0, 0.0, 0.0);
-    
     
     printf("added %s at %d\n", name, index, pos);
 }
@@ -283,8 +283,6 @@ ServerToClient& Game::getServerToClientData(void) {
         if (j == MAX_ROCKETS) {
             break;
         }
-
-        printf("sending rocket %d of %d\n", i, rockets.size());
 
         sdata_out.meta.rockets[j].pos = rockets[i]->getNode().getPosition();
         sdata_out.meta.rockets[j].orient = rockets[i]->getNode().getOrientation();
