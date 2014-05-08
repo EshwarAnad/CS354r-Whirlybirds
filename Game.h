@@ -17,6 +17,7 @@ protected:
 public:
 	Heli* helis[NUM_PLAYERS];
     Heli* heli; // our helicopter
+	Heli* heliAI;
     Level* level;
 	Ball* powerup;
     std::vector<Rocket*> rockets;
@@ -78,6 +79,12 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         makeNewHeli(0);
         heli = helis[0];
     }
+
+	if (isSinglePlayer) {
+		heliAI = new Heli("heliAI", mSceneMgr, simulator, 3.0, 1.0, Ogre::Vector3(300.0, 350.0, -350.0), 0.9, 0.1, "Game/Helicopter");
+		heliAI->addToSimulator();
+		heliAI->setKinematic();
+	}
 }
 
 void Game::addRocket(Heli* mheli) {
@@ -134,6 +141,8 @@ void Game::makeNewHeli(int index) {
 }
 
 void Game::rotateHeliProps(Ogre::Real t) {
+	if (heliAI)
+		heliAI->animate(t);
     for (int i = 0; i < NUM_PLAYERS; i++) {
         if (helis[i]) {
             helis[i]->animate(t);

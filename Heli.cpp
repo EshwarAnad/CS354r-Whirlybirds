@@ -291,7 +291,7 @@ void Heli::expirePowerup() {
 }
 
 void Heli::hit(CollisionContext& ctxt, int damage, bool same){
-	if(!same){
+	if(!same && !shield){
 		std::cout << "Taking damage o noes" << std::endl;
 		health -= damage;
 	}
@@ -387,7 +387,8 @@ void Heli::kill() {
 	prop->setVisible(false);
 	//put it in purgatory!
 	rootNode->setPosition(0, -1000, 0);
-	sim->soundSystem->playTaps();
+	if (name != "heliAI")
+		sim->soundSystem->playTaps();
 }
 
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
@@ -399,7 +400,8 @@ void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 		chass->setVisible(true);
 		prop->setVisible(true);
 		rootNode->setPosition(pos);
-		sim->soundSystem->playTaps();
+		if (name != "heliAI")
+			sim->soundSystem->playTaps();
 	}
 	else{
 		timeToLive -= dt;
