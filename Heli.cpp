@@ -250,7 +250,7 @@ void Heli::setPowerup(Ogre::String pwr) {
 	if (pwr == "speed") {
 		expirePowerup();
 		hasPowerup = true;
-		speedModifier = 2.0;
+		speedModifier = 6.0;
 		sim->soundSystem->playPowerUp(0);
 	} else if (pwr == "power") {
 		expirePowerup();
@@ -275,8 +275,8 @@ void Heli::setPowerup(Ogre::String pwr) {
 }
 
 void Heli::expirePowerup() {
-	if (speedModifier != 1.0) {
-		speedModifier = 1.0;
+	if (speedModifier != 3.0) {
+		speedModifier = 3.0;
 		sim->soundSystem->playPowerDown(0);
 	} else if (powerModifier != 1.0) {
 		powerModifier = 1.0;
