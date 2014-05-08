@@ -9,6 +9,14 @@
 #include <SDL/SDL_mixer.h>
 #include <SDL/SDL_audio.h>
 
+enum SOUND {
+    SOUND_NONE,
+    SOUND_ROCKET,
+    SOUND_ROCKET_EXPLODE,
+    SOUND_HELI_EXPLODE,
+    SOUND_WALL_HIT
+};
+
 class SoundSystem
 {
 protected:
@@ -26,7 +34,8 @@ protected:
 	Mix_Chunk *heliExplode;
 	Mix_Chunk *rocketExplode;
 	Mix_Chunk *taps;
-
+    SOUND lastSoundPlayed;
+    
 public:
 	bool isMuted;
     SoundSystem(void);
@@ -40,6 +49,8 @@ public:
 	void playHeliExplode(void);
 	void playRocketExplode(void);
 	void playTaps(void);
+	SOUND getLastSoundPlayed(void);
+    void playSound(SOUND s);
 };
 
 #endif //#ifndef __SoundSystem_h_

@@ -35,6 +35,26 @@ SoundSystem::SoundSystem()
 	Mix_VolumeChunk(taps, 50);
 }
 
+SOUND SoundSystem::getLastSoundPlayed() {
+    SOUND ret = lastSoundPlayed;
+    lastSoundPlayed = SOUND_NONE;
+    return ret;
+}
+
+void SoundSystem::playSound(SOUND s) {
+    switch (s) {
+        case SOUND_ROCKET:
+            playShootRocket();
+        case SOUND_ROCKET_EXPLODE:
+            playRocketExplode();
+        case SOUND_HELI_EXPLODE:
+            playHeliExplode();
+        case SOUND_WALL_HIT:
+            playWallHit();
+        break; 
+    }
+}
+
 /* mute and unmute all sounds */
 void SoundSystem::mute(void)
 {
@@ -102,6 +122,8 @@ void SoundSystem::playPowerDown(int p)
 
 void SoundSystem::playShootRocket()
 {
+   lastSoundPlayed = SOUND_ROCKET;
+    
 	if (!isMuted) {
 		if (Mix_Playing(4) == 0)
 			Mix_PlayChannel(4, shootRocket, 0);
@@ -112,19 +134,25 @@ void SoundSystem::playShootRocket()
 
 void SoundSystem::playWallHit()
 {
+    lastSoundPlayed = SOUND_WALL_HIT;
+
 	if (!isMuted && Mix_Playing(6) == 0)
 		Mix_PlayChannel(6, wallHit, 0);
 }
 
 void SoundSystem::playHeliExplode()
 {
-	if (!isMuted && Mix_Playing(7) == 0)
+    lastSoundPlayed = SOUND_HELI_EXPLODE;
+	
+    if (!isMuted && Mix_Playing(7) == 0)
 		Mix_PlayChannel(7, heliExplode, 0);
 }
 
 void SoundSystem::playRocketExplode()
 {
-	if (!isMuted) {
+    lastSoundPlayed = SOUND_ROCKET_EXPLODE;
+	
+    if (!isMuted) {
 		if (Mix_Playing(8) == 0)
 			Mix_PlayChannel(8, rocketExplode, 0);
 		else if (Mix_Playing(9) == 0)

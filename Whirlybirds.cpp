@@ -220,7 +220,7 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 
 	if (simulator) {
 		if (arg.key == OIS::KC_X) {
-			simulator->soundSystem->mute();
+		    simulator->soundSystem->mute();
 		} else if (arg.key == OIS::KC_C) {
 			//simulator->soundSystem->playMusic();
 		}
