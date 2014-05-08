@@ -42,6 +42,9 @@ Heli::Heli(
 	timeToDie = 10.0;
 	alive = true;
 	deaths = 0;
+
+	part = mgr->createParticleSystem(nym, "Examples/Smoke");
+	fire = false;
 }
 
 void Heli::DestroyAllAttachedMovableObjects( Ogre::SceneNode* i_pSceneNode )
@@ -317,6 +320,12 @@ void Heli::hit(CollisionContext& ctxt, int damage, bool same){
 	//Push the helicopter out of the object it's colliding with by translating along the object's normal
 	//This prevents the helicopter from getting stuck in the object
 	rootNode->setPosition(temp + 1.0 * Ogre::Vector3(ctxt.normal.getX(), ctxt.normal.getY(), ctxt.normal.getZ()));
+
+	if (health <= 25 && !fire)
+	{
+		rootNode->attachObject(part);
+		fire = true;
+	}
 }
 
 btVector3 Heli::reflect(btVector3& a, btVector3& b){
@@ -391,6 +400,8 @@ void Heli::kill() {
 	if (name != "heliAI")
 		sim->soundSystem->playTaps();
 	deaths++;
+
+	rootNode->detachObject(part);
 }
 
 void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
@@ -404,6 +415,8 @@ void Heli::respawn(Ogre::Vector3 pos, Ogre::Real dt, GUI* gui){
 		rootNode->setPosition(pos);
 		if (name != "heliAI")
 			sim->soundSystem->playTaps();
+
+		fire = false;
 	}
 	else{
 		timeToLive -= dt;
