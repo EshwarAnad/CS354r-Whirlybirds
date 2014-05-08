@@ -49,9 +49,9 @@ protected:
     bool isClient;
     bool gameplay;
     bool isSinglePlayer;
-	time_t powerupTime;
+    bool clientFiringRocket;
+  	time_t powerupTime;
 	time_t currentTime;
-    unsigned int rocketNum;
 
 	// Game Objects
     Game* game;

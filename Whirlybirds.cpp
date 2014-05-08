@@ -19,7 +19,7 @@ This source file is part of the
 //-------------------------------------------------------------------------------------
 Whirlybirds::Whirlybirds()
 : simulator(NULL), isClient(false), gameplay(false), isSinglePlayer(false)
-{ rocketNum = 0;}
+{}
 
 //-------------------------------------------------------------------------------------
 Whirlybirds::~Whirlybirds(void)
@@ -103,24 +103,14 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
             yMove = -evt.timeSinceLastFrame;
         if (mKeyboard->isKeyDown(OIS::KC_E) && e_time == 0.0){
-            Ogre::Vector3 pos = game->heli[0].getNode().getPosition();
-            pos = pos + Ogre::Vector3(0, 20, 0);
-            Ogre::Matrix3 ax = game->heli[0].getNode().getLocalAxes();
-            char name[100] = {0};
-            sprintf(name, "rocket%d", rocketNum);
-            //sprintf(name, "rocket%d", int(game->rockets.size()));
-            rocketNum++;
-            //std::cout << "Creating new Rocket! " << name << " @ " << int(game->rockets.size()) << std::endl;
-            game->rockets.push_back(new Rocket(name, game->mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
-            Ogre::Quaternion angle = game->heli->getNode().getOrientation();
-            Ogre::Vector3 pTemp(angle* Ogre::Vector3::NEGATIVE_UNIT_Z * 700);
-            game->rockets[game->rockets.size()-1]->addToSimulator();
-            game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
-            //game->rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
-            simulator->soundSystem->playShootRocket();
+            if (!isClient || isSinglePlayer) {
+                game->addRocket(game->heli);
+                simulator->soundSystem->playShootRocket();
+            } else {
+                clientFiringRocket = true;
+            }
             e_time += evt.timeSinceLastFrame;
-        }        
-
+        }   
 
         for (int i = 0; i < game->rockets.size(); i++)
         {
@@ -166,7 +156,9 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             cdata.yMove = yMove;
             cdata.zMove = zMove;
             cdata.mMove = mMove;
+            cdata.firingRocket = clientFiringRocket;
             client->sendMsg(cdata);
+            clientFiringRocket = false;
         } else {
             // step the simulator
             simulator->stepSimulation(evt.timeSinceLastFrame, 10, 1/60.0f);
@@ -236,7 +228,6 @@ bool Whirlybirds::keyPressed(const OIS::KeyEvent &arg)
 
         mShutDown = true;
     }
-
 	return true;
 }
 
@@ -291,6 +282,7 @@ bool Whirlybirds::singlePlayer(const CEGUI::EventArgs &e)
 {
     isClient = false;
     isSinglePlayer = true;
+    clientFiringRocket = false;
 
 	simulator->soundSystem->playMusic();
 	simulator->soundSystem->playRotor();

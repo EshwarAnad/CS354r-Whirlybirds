@@ -81,7 +81,7 @@ void HeliProp::update(){
             } else if(objName != parent->getChassName()) {
                 if (Ogre::StringUtil::startsWith(objName, "cube", true) || Ogre::StringUtil::startsWith(objName, "heli", true) || objName == "base")
                     simulator->soundSystem->playWallHit();
-                hit(callback->ctxt, 1, objName == compName);
+                hit(callback->ctxt, 10, objName == compName);
                 if (DEBUG && objName != compName) { std::cout << "Hit: " << objName << std::endl; }
                 compName = objName;
             }

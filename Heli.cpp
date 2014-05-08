@@ -293,7 +293,7 @@ void Heli::expirePowerup() {
 void Heli::hit(CollisionContext& ctxt, int damage, bool same){
 	if(!same){
 		std::cout << "Taking damage o noes" << std::endl;
-		health -= 10;
+		health -= damage;
 	}
 	if(alive && health <= 0)
 		kill();

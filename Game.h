@@ -13,6 +13,7 @@ protected:
     std::vector<Ogre::Vector3> positions;
     bool isClient;
     bool isSinglePlayer;
+    unsigned int rocketNum;
 
 public:
 	Heli* helis[NUM_PLAYERS];
@@ -35,6 +36,7 @@ public:
     void rotateHeliProps(Ogre::Real t);
 	void spawnPowerup(void);
     void makeNewHeli(int index);
+    void addRocket(Heli* heli);
     Ogre::Vector3 getSpawnPos();
 
     void display(void); // debugging
@@ -49,6 +51,7 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
 	mgr = mSceneMgr;
     static Ogre::Real WORLDSCALE = 3.0;
     Ogre::Vector3 origin(0, 0, 0);
+    rocketNum = 0;
    
     // level 
     level = new Level("mylevel", mgr, sim, WORLDSCALE, origin, 0.9, 0.1, "Examples/Rockwall");
@@ -77,6 +80,23 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
         makeNewHeli(0);
         heli = helis[0];
     }
+}
+
+void Game::addRocket(Heli* mheli) {
+    Ogre::Vector3 pos = mheli->getNode().getPosition();
+    pos = pos + Ogre::Vector3(0, 20, 0);
+    Ogre::Matrix3 ax = mheli->getNode().getLocalAxes();
+    
+    char name[100] = {0};
+    sprintf(name, "rocket%d", rocketNum);
+    rocketNum++;
+    rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+    
+    Ogre::Quaternion angle = mheli->getNode().getOrientation();
+    Ogre::Vector3 pTemp(angle* Ogre::Vector3::NEGATIVE_UNIT_Z * 700);
+    rockets[rockets.size()-1]->addToSimulator();
+    rockets[rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
+    //rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
 }
 
 void Game::makeNewHeli(int index) {
@@ -163,6 +183,10 @@ void Game::setDataFromClient(ClientToServer& data, int i) {
         helis[i]->move(data.xMove, data.yMove, data.zMove);
         helis[i]->rotate(-data.mMove*0.035);
         helis[i]->updateTransform();
+        
+        if (data.firingRocket) {
+            addRocket(helis[i]);
+        }
     }
 }
 
@@ -211,6 +235,7 @@ ServerToClient& Game::getServerToClientData(void) {
             sdata_out.heliPoses[np].orient = helis[i]->getNode().getOrientation();
             sdata_out.heliPoses[np].index = i;
             sdata_out.heliPoses[np].exists = true;
+            
             np += 1;
         } 
     }

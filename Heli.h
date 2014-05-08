@@ -14,9 +14,9 @@
 #define maxYawSpeed 20.0
 #define speedIncrement 0.05
 #define speedBase 0.002
-#define maxTilt 25.0
+#define maxTilt 20.0
 #define levelSpeed 0.02
-#define rotSpeed 20.0
+#define rotSpeed 10.0
 
 class Heli {
 protected:
