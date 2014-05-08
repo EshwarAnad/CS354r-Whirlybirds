@@ -90,6 +90,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
         else
             e_time = 0.0;
         
+
         if(mKeyboard->isKeyDown(OIS::KC_W))
 			zMove = -evt.timeSinceLastFrame;
         if (mKeyboard->isKeyDown(OIS::KC_S))
@@ -102,7 +103,17 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
 			yMove = evt.timeSinceLastFrame;
 		if (mKeyboard->isKeyDown(OIS::KC_SPACE))
             yMove = -evt.timeSinceLastFrame;
-        if (mKeyboard->isKeyDown(OIS::KC_E) && e_time == 0.0){
+        if (mMouse->getMouseState().buttonDown(OIS::MB_Left) && e_time == 0.0)
+        {
+            if (gameplay && (!isClient || isSinglePlayer)) {
+                game->addRocket(game->heli);
+                simulator->soundSystem->playShootRocket();
+            } else {
+                clientFiringRocket = true;
+            }
+            e_time += evt.timeSinceLastFrame;
+        }
+        /*if (mKeyboard->isKeyDown(OIS::KC_E) && e_time == 0.0){
 
 
             if (gameplay && (!isClient || isSinglePlayer)) {
@@ -112,7 +123,7 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                 clientFiringRocket = true;
             }
             e_time += evt.timeSinceLastFrame;
-        }   
+        }   */
 
         if (!isClient || isSinglePlayer) {
             for (int i = 0; i < game->rockets.size(); i++)
@@ -274,6 +285,15 @@ bool Whirlybirds::mouseMoved(const OIS::MouseEvent &arg)
 
 bool Whirlybirds::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
 {
+ /*  if(id == OIS::MB_Left)
+    {
+        if (gameplay && (!isClient || isSinglePlayer)) {
+            game->addRocket(game->heli);
+            simulator->soundSystem->playShootRocket();
+        } else {
+            clientFiringRocket = true;
+        }
+    }*/
 	CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
 	return true;
 }
