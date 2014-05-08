@@ -166,6 +166,8 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
             cdata.zMove = zMove;
             cdata.mMove = mMove;
             cdata.firingRocket = clientFiringRocket;
+            if(!game->heli->alive)
+                cdata.respawned = true;
             client->sendMsg(cdata);
             clientFiringRocket = false;
         } else {
@@ -189,11 +191,13 @@ bool Whirlybirds::frameRenderingQueued(const Ogre::FrameEvent& evt) {
                     for (int i = 0; i < NUM_PLAYERS - 1; i++) {
                         ClientToServer cdata;
                         if (server->recMsg(cdata, i)) {
+                            cdata.respawned = false;
                             game->setDataFromClient(cdata, i+1);
                             if(game->helis[i+1] != NULL){
                                 game->helis[i+1]->inBounds(game->level->getBounds(), evt.timeSinceLastFrame, NULL);
-                                if(!game->helis[i+1]->alive)
+                                if(!game->helis[i+1]->alive){
                                     game->helis[i+1]->respawn(game->getSpawnPos(), evt.timeSinceLastFrame, NULL);
+                                }
                             }
                             if (cdata.disconnecting) {
                                 server->removeConnection(i);

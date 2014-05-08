@@ -205,6 +205,8 @@ void Game::setDataFromClient(ClientToServer& data, int i) {
         helis[i]->move(data.xMove, data.yMove, data.zMove);
         helis[i]->rotate(-data.mMove*0.035);
         helis[i]->updateTransform();
+        if(data.respawned)
+            helis[i]->alive = true;
         
         if (data.firingRocket) {
             addRocket(helis[i]);
@@ -244,6 +246,9 @@ void Game::setDataFromServer(ServerToClient& data) {
    
     assert(data.meta.clientIndex != 0 && "our heli is being set to the server's!");
     assert(heli != NULL && "we haven't received any data for our heli!");
+
+    if(!data.heliPoses[data.meta.clientIndex].isAlive && heli->alive)
+        heli->kill();
     
     for (int i = 0; i < data.meta.numRockets && i < MAX_ROCKETS; i++) {
         if (i == rockets.size()) {
@@ -281,6 +286,7 @@ ServerToClient& Game::getServerToClientData(void) {
             sdata_out.heliPoses[np].orient = helis[i]->getNode().getOrientation();
             sdata_out.heliPoses[np].index = i;
             sdata_out.heliPoses[np].exists = true;
+            sdata_out.heliPoses[np].isAlive = helis[i]->alive;
             sdata_out.heliPoses[np].deaths = helis[i]->deaths; 
             //printf("player %d died %d times\n", i, helis[i]->deaths);
             np += 1;
