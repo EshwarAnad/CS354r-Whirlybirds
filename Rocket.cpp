@@ -14,6 +14,7 @@ Rocket::Rocket(
     ) 
 : GameObject(nym, mgr, sim, restitution, friction)
 {
+    //rootNode = mgr->getRootSceneNode()->createChildSceneNode(nym);
     pos2 = pos;
     velocity = vel;
     if (mgr) {
@@ -50,6 +51,9 @@ Rocket::Rocket(
     fired = 0;
     timeToLive = 5.0;
     destroy = false;
+
+
+    //pMan = new ParticleSystemManager();
 }
 
 //not used
@@ -116,6 +120,7 @@ void Rocket::timeToExpire(Ogre::Real dt){
     }
     timeToLive -= dt;
 }
+
 
 Rocket::~Rocket() {
     rootNode->detachAllObjects();
