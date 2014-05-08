@@ -102,7 +102,11 @@ void Game::addRocket(Heli* mheli) {
     char name[100] = {0};
     sprintf(name, "rocket%d", rocketNum);
     rocketNum++;
-    rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
+    Rocket* temp = new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket");
+    Ogre::ParticleSystem* part = mSceneMgr->createParticleSystem(name, "Examples/Smoke");
+    temp->getNode().attachObject(part);
+    rockets.push_back(temp);
+    //rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
 
     if (mheli != NULL) { 
         Ogre::Quaternion angle = mheli->getNode().getOrientation();
