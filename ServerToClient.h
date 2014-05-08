@@ -14,6 +14,7 @@ struct HeliInfo {
     Ogre::Quaternion orient;
     bool exists;
     int index;
+    bool isAlive;
 };
 
 struct MetaData {
