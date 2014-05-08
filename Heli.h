@@ -41,7 +41,7 @@ protected:
     float timeToLive; //how long until respawn
 
 public:
-	int deaths;
+	unsigned char deaths;
     HeliChass* chass;
     HeliProp* prop;
     Heli(
