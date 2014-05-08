@@ -3,7 +3,7 @@
 #include <btBulletDynamicsCommon.h>
 #include "Server.h"
 
-struct MissileInfo {
+struct RocketInfo {
     Ogre::Vector3 pos;
     Ogre::Quaternion orient;
     bool exists;
@@ -21,6 +21,9 @@ struct MetaData {
     int clientIndex; // set by the server, specific to the client it sends to
     int sound;
     int numPlaying;
+    long time;
+    int numRockets;
+    RocketInfo rockets[MAX_ROCKETS];
 };
 
 struct ServerToClient {
@@ -30,6 +33,7 @@ struct ServerToClient {
     ServerToClient() {
         meta.sound = 0;
         meta.numPlaying = 0;
+        meta.numRockets = 0;
         meta.clientIndex = -1;
         meta.shutdown = false;
 

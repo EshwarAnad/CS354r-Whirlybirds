@@ -81,19 +81,26 @@ Game::Game(Simulator* simulator, Ogre::SceneManager* mSceneMgr, bool isClient, b
 }
 
 void Game::addRocket(Heli* mheli) {
-    Ogre::Vector3 pos = mheli->getNode().getPosition();
-    pos = pos + Ogre::Vector3(0, 20, 0);
-    Ogre::Matrix3 ax = mheli->getNode().getLocalAxes();
+    Ogre::Vector3 pos;
+    Ogre::Matrix3 ax;
+    
+    if (mheli != NULL) {
+        pos = mheli->getNode().getPosition();
+        pos = pos + Ogre::Vector3(0, 20, 0);
+        ax = mheli->getNode().getLocalAxes();
+    }
     
     char name[100];
     sprintf(name, "rocket%d", int(rockets.size()));
     rockets.push_back(new Rocket(name, mSceneMgr, simulator, 3.0, 1.0, pos, ax, 5.0, "Game/Rocket"));
-    
-    Ogre::Quaternion angle = mheli->getNode().getOrientation();
-    Ogre::Vector3 pTemp(angle* Ogre::Vector3::NEGATIVE_UNIT_Z * 700);
-    rockets[rockets.size()-1]->addToSimulator();
-    rockets[rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
-    //rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
+
+    if (mheli != NULL) { 
+        Ogre::Quaternion angle = mheli->getNode().getOrientation();
+        Ogre::Vector3 pTemp(angle* Ogre::Vector3::NEGATIVE_UNIT_Z * 700);
+        rockets[rockets.size()-1]->addToSimulator();
+        rockets[rockets.size()-1]->getBody()->setLinearVelocity(btVector3(pTemp.x, pTemp.y, pTemp.z));
+        //rockets[game->rockets.size()-1]->getBody()->setLinearVelocity(btVector3(0, -10, -500));
+    }
 }
 
 void Game::makeNewHeli(int index) {
@@ -214,9 +221,21 @@ void Game::setDataFromServer(ServerToClient& data) {
     }
  
     heli = helis[data.meta.clientIndex];
-    
+   
     assert(data.meta.clientIndex != 0 && "our heli is being set to the server's!");
     assert(heli != NULL && "we haven't received any data for our heli!");
+    
+    for (int i = 0; i < data.meta.numRockets && i < MAX_ROCKETS; i++) {
+        if (i == rockets.size()) {
+            printf("  adding new rocket\n");
+            addRocket(NULL);
+        }
+        
+        assert(data.meta.rockets[i].exists);       
+        
+        rockets[i]->getNode().setPosition(data.meta.rockets[i].pos);
+        rockets[i]->getNode().setOrientation(data.meta.rockets[i].orient);
+    }
 }
 
 ServerToClient& Game::getServerToClientData(void) {
@@ -243,6 +262,26 @@ ServerToClient& Game::getServerToClientData(void) {
         sdata_out.heliPoses[j].exists = false;
     }
 
+    int j = 0;
+    for (int i = rockets.size() - 1; i >= 0; i--) {
+        if (j == MAX_ROCKETS) {
+            break;
+        }
+
+        printf("sending rocket %d of %d\n", i, rockets.size());
+
+        sdata_out.meta.rockets[j].pos = rockets[i]->getNode().getPosition();
+        sdata_out.meta.rockets[j].orient = rockets[i]->getNode().getOrientation();
+        sdata_out.meta.rockets[j].exists = true;
+        
+        j++;
+    }
+
+    sdata_out.meta.numRockets = rockets.size();
+    if (sdata_out.meta.numRockets > MAX_ROCKETS) {
+        sdata_out.meta.numRockets = MAX_ROCKETS;
+    }
+        
     return sdata_out;
 }
 
